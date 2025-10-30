@@ -1,0 +1,8 @@
+.page-title {
+  display: block;
+  text-align: center;
+  font-size: 60rpx;   /* 更大 */
+  font-weight: 900;   /* 更粗，700 是常规粗体，900 是特粗 */
+  margin-bottom: 30rpx;
+  color: #222;
+}

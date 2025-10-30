@@ -1,0 +1,52 @@
+<view class="container">
+  <!-- 顶部导航栏 -->
+  <view class="navbar">
+    <view class="back-btn" bindtap="onBack">
+      <image src="../../images/icon/返回 .png" class="back-icon"></image>
+    </view>
+    <text class="nav-title">血压录入</text>
+  </view>
+
+  <!-- 顶部状态栏 -->
+  <!-- <view class="status-bar">
+    <text class="status-time">{{time}}</text>
+    <text class="status-network">{{network}}</text>
+  </view> -->
+
+  <!-- 中央主文案 -->
+  <view class="main-content">
+    <image src="/images/icon/喇叭.png" class="icon-with-border-horn" style="width:36px;height:36px;" />
+    <text class="main-text">
+      {{isRecognizing ? '正在聆听...' : '请说您今天的收缩压和舒张压'}}
+    </text>
+    <view>
+      <image src="/images/icon/麦克风.png" class="icon-with-border-mic {{isRecognizing ? 'mic-active' : ''}}" style="width:100px;height:100px;" />
+    </view>
+    <view class="recognized-value" wx:if="{{recognizedValue}}">
+      <text style="font-size: 40px;">{{recognizedValue}}</text>
+    </view>
+    <view class="status-hint-container">
+      <text class="status-hint" wx:if="{{!isComplete && recognizedValue && !isRecognizing}}">
+        继续说第二个数字
+      </text>
+      <text class="status-hint success" wx:if="{{isComplete}}">
+        识别完成，请确认
+      </text>
+      <text class="status-hint processing" wx:if="{{isRecognizing && !recognizedValue}}">
+        正在聆听您的语音...
+      </text>
+    </view>
+  </view>
+
+  
+
+  <!-- 底部操作按钮 -->
+  <view class="bottom-buttons">
+    <view class="retry-btn" bindtap="onRetry">
+      不对，重说
+    </view>
+    <view class="save-btn" bindtap="onSave">
+      对，保存
+    </view>
+  </view>
+</view>

@@ -1,0 +1,16 @@
+<view class="container">
+  <!-- 顶部导航：居中标题+返回图标 -->
+  <view class="header">
+    <image class="back-icon" src="../../images/icon/back.png" mode="widthFix" bindtap="goBack" />
+    <view class="title">血压历史</view>
+  </view>
+
+  <!-- 折线图容器：宽度占满，突出数据展示 -->
+  <canvas canvas-id="bpChart" class="chart-canvas"></canvas>
+
+  <!-- 听方言解读按钮：居中显示，强化交互引导 -->
+  <view class="dialect-btn">
+    <text class="btn-text" bindtap="playDialect">听方言解读</text>
+    <image class="speaker-icon" src="../../images/icon/喇叭.png" mode="widthFix" bindtap="playVoice" />
+  </view>
+</view>

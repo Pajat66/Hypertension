@@ -1,0 +1,6 @@
+Flask
+Flask-SQLAlchemy
+PyMySQL
+Flask-Cors
+gunicorn
+gevent

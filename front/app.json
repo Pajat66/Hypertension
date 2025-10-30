@@ -1,0 +1,30 @@
+{
+  "pages": [
+    "pages/first/index",
+    "pages/login/login",
+    "pages/register/register",
+    "pages/home/index",
+    "pages/profile/index",
+    "pages/measure/index",
+    "pages/bp-input/index",
+    "pages/medication/index",
+    "pages/pt-reminder/index",
+    "pages/pt-login/index",
+    "pages/pt-register/index",
+    "pages/doctorhome/index",
+    "pages/management/index",
+    "pages/message/index",
+    "pages/blood/index",
+    "pages/reminder/index",
+    "pages/chat/index",
+    "pages/pt-blood/index",
+    "pages/pt-chat/index",
+    "pages/doctor-list/index"
+  ],
+  "window": {
+    "navigationBarTitleText": "适农高血压管理",
+    "navigationBarBackgroundColor": "#ffffff",
+    "navigationBarTextStyle": "black",
+    "navigationStyle": "custom"
+  }
+}

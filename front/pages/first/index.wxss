@@ -1,0 +1,95 @@
+/* pages/index/index.wxss */
+.container {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  background-color: #f0fffd;
+  min-height: 100vh;
+  padding: 40rpx 20rpx;
+  box-sizing: border-box;
+  padding-top: 120rpx; 
+}
+
+.title {
+  font-size: 60rpx;
+  font-weight: 900;
+  color: #222;
+  margin-top: 60rpx; 
+  margin-bottom: 30rpx;
+  text-align: center;
+}
+
+.subtitle {
+  font-size: 28rpx;
+  color: #333;
+  margin-bottom: 120rpx; 
+  text-align: center;
+}
+
+.tip {
+  font-size: 34rpx; 
+  font-weight: 700;
+  color: #333;
+  margin-bottom: 60rpx; 
+}
+
+.entry-btn {
+  width: 580rpx; 
+  height: 360rpx; 
+  background-color: #c5fffe;
+  border-radius: 20rpx;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  margin-bottom: 60rpx; 
+  position: relative;
+  box-shadow: 0 4rpx 10rpx rgba(0,0,0,0.1); 
+}
+
+.icon {
+  width: 120rpx; 
+  height: 120rpx;
+  margin-bottom: 20rpx;
+}
+
+.speaker {
+  width: 50rpx; 
+  height: 50rpx;
+  position: absolute;
+  top: 40rpx;
+  right: 40rpx;
+}
+
+.btn-title {
+  font-size: 44rpx; 
+  font-weight: 700;
+  color: #000;
+  margin-bottom: 15rpx;
+}
+
+.btn-subtitle {
+  font-size: 28rpx; 
+  color: #333;
+  width: 80%;
+  text-align: center;
+  line-height: 1.5; 
+}
+
+.help {
+  margin-top: 100rpx; 
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+.help-text {
+  font-size: 26rpx; 
+  color: #333;
+  margin-bottom: 15rpx;
+}
+
+.system-name {
+  font-size: 24rpx;
+  color: #666; /* 稍微调浅系统名称颜色 */
+}

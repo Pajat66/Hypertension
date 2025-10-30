@@ -1,0 +1,53 @@
+<view class="container">
+  <view style="height: 8px;"></view>
+  <text style="width:260px;height:72px;display:block;margin:0 auto 18px auto;"></text>
+  <view style="padding-left:12px;">
+    <text style="font-size:22px;font-weight:700;">姓名</text>
+  </view>
+
+  <!-- 大卡片按钮组 -->
+  <view style="padding:12px;">
+    <view class="card" style="margin-bottom:14px; border-radius:12px; padding:18px;" bindtap="onTapMicBp">
+      <view style="display:flex;align-items:center;justify-content:space-between;">
+        <view>
+          <text class="title-large">血压录入</text>
+          <view style="height:8px;"></view>
+          <text style="font-size:25px;font-weight: 700;">说收缩压、舒张压</text>
+        </view>
+        <image src="/images/icon/麦克风.png" style="width:36px;height:36px;" />
+      </view>
+    </view>
+
+    <view class="card" style="margin-bottom:14px; border-radius:12px; padding:18px;" bindtap="onTapMicMed">
+      <view style="display:flex;align-items:center;justify-content:space-between;">
+        <view>
+          <text class="title-large">查用药</text>
+          <view style="height:8px;"></view>
+          <text style="font-size:25px;font-weight: 700;">说收缩压、舒张压</text>
+        </view>
+        <image src="/images/icon/麦克风.png" style="width:36px;height:36px;" />
+      </view>
+    </view>
+
+    <view class="card" style="margin-bottom:14px; border-radius:12px; padding:14px;" bindtap="onSpeaker">
+      <view style="display:flex;align-items:center;justify-content:space-between;">
+        <text class="title-large">听提醒</text>
+        <image src="/images/icon/喇叭.png" style="width:35px;height:35px;"/>
+      </view>
+    </view>
+
+    <!-- 两个小按钮并排：新增 bindtap 事件绑定 -->
+    <view style="display:flex;gap:12px;margin-top:8px;">
+      <!-- 联系村医留言：绑定 gotoPtChat 事件 -->
+      <view class="card" style="flex:1;border-radius:12px;padding:20px; text-align:center;" bindtap="gotoPtChat">
+        <image src="/images/icon/留言.png" style="width:50px;height:50px;display:block;margin:0 auto 18px auto;"/>
+        <text style="font-size:30px;font-weight:600;">联系村医留言</text>
+      </view>
+      <!-- 血压历史：绑定 gotoBlood 事件 -->
+      <view class="card" style="flex:1;border-radius:12px;padding:20px; text-align:center;" bindtap="gotoBlood">
+        <image src="/images/icon/历史.png" style="width:50px;height:50px;display:block;margin:0 auto 18px auto;"/>
+        <text style="font-size:30px;font-weight:600;">血压历史</text>
+      </view>
+    </view>
+  </view>
+</view>

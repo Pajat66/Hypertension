@@ -1,0 +1,27 @@
+<view class="container">
+  <view class="name">姓名</view>
+  <!-- 统计项改为居中布局 -->
+  <view class="stats">
+    <view class="stat-item">
+      <view class="stat-label">管辖患者数：</view>
+      <view class="stat-value">8人</view>
+    </view>
+    <view class="stat-item">
+      <view class="stat-label">今日未录血压数：</view>
+      <view class="stat-value red">5人</view>
+    </view>
+  </view>
+  <!-- 放大后的按钮 -->
+  <view class="btn" bindtap="gotoPatientManage">
+    <image class="speaker-icon" src="../../images/icon/喇叭.png" mode="widthFix" />
+    <view class="btn-text">患者管理</view>
+  </view>
+  <view class="btn" bindtap="gotoPatientMessage">
+    <image class="speaker-icon" src="../../images/icon/喇叭.png" mode="widthFix" />
+    <view class="btn-text">患者消息</view>
+  </view>
+  <view class="btn" bindtap="gotoBatchRemind">
+    <image class="speaker-icon" src="../../images/icon/喇叭.png" mode="widthFix" />
+    <view class="btn-text">批量提醒</view>
+  </view>
+</view>

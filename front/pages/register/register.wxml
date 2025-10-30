@@ -1,0 +1,70 @@
+<view class="container">
+  <view style="height: 28px;"></view>
+  <text style="width:260px;height:72px;display:block;margin:0 auto 18px auto;"></text>
+  <text class="page-title">适农高血压管理系统</text>
+
+  <view class="card" style="padding:18px;">
+    <view class="input-row" style="margin-bottom:18px;">
+      <view class="input-left">
+        <text style="font-size:30px;font-weight:700;">姓名</text>
+        <input placeholder="请输入姓名" bindinput="onInputName" value="{{name}}" />
+      </view>
+      <image class="icon-right" src="/images/icon/麦克风.png" />
+    </view>
+
+    <view class="input-row" style="margin-bottom:18px;">
+      <view class="input-left">
+        <text style="font-size:30px;font-weight:700;">手机号</text>
+        <input placeholder="请输入手机号" bindinput="onInputPhone" value="{{phone}}" />
+      </view>
+      <image class="icon-right" src="/images/icon/麦克风.png" />
+    </view>
+
+    <view class="input-row" style="margin-bottom:18px;">
+      <view class="input-left">
+        <text style="font-size:30px;font-weight:700;">密码</text>
+        <input placeholder="请输入密码" password="true" bindinput="onInputPassword" value="{{password}}" />
+      </view>
+      <image class="icon-right" src="/images/icon/麦克风.png" />
+    </view>
+
+    <view class="input-row" style="margin-bottom:18px;">
+      <view class="input-left">
+        <text style="font-size:30px;font-weight:700;">确认密码</text>
+        <input placeholder="请再次输入密码" password="true" bindinput="onInputConfirm" value="{{confirm}}" />
+      </view>
+      <image class="icon-right" src="/images/icon/麦克风.png" />
+    </view>
+
+    <view class="input-row" style="margin-bottom:18px;">
+      <view class="input-left">
+        <text style="font-size:30px;font-weight:700;">医师编号</text>
+        <input placeholder="请输入你的医师编号" bindinput="onInputDoctorId" value="{{doctorId}}" />
+      </view>
+      <image class="icon-right" src="/images/icon/麦克风.png" />
+    </view>
+
+    <view class="input-row" style="margin-bottom:18px;">
+      <view class="input-left">
+        <text style="font-size:30px;font-weight:700;">角色</text>
+        <input placeholder="请输入角色（如：村医）" bindinput="onInputRole" value="{{role}}" />
+      </view>
+      <image class="icon-right" src="/images/icon/麦克风.png" />
+    </view>
+
+    <view class="input-row" style="margin-bottom:12px;">
+      <view class="input-left">
+        <text style="font-size:30px;font-weight:700;">村庄</text>
+        <input placeholder="请输入所在村庄" bindinput="onInputVillage" value="{{village}}" />
+      </view>
+      <image class="icon-right" src="/images/icon/麦克风.png" />
+    </view>
+
+    <view style="margin-top:18px;">
+      <view class="big-btn" bindtap="onRegister">注册</view>
+    </view>
+    <view style="margin-top:12px;text-align:center;">
+      <navigator url="/pages/login/login">已有账号 去登陆</navigator>
+    </view>
+  </view>
+</view>

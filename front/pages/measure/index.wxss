@@ -1,0 +1,128 @@
+/* 页面基础布局 */
+.page {
+  box-sizing: border-box;
+  padding: 28rpx;
+  min-height: 100vh;
+  background: #f7f8fa;
+  display: flex;
+  flex-direction: column;
+  gap: 28rpx;
+}
+
+/* 顶部标题 */
+.title {
+  font-size: 36rpx;
+  font-weight: 600;
+  color: #1f2d3d;
+}
+
+/* 麦克风按钮 */
+.mic-btn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 18rpx;
+  padding: 28rpx 24rpx;
+  border-radius: 20rpx;
+  background: #ffffff;
+  border: 2rpx solid #e5e9f2;
+  box-shadow: 0 6rpx 18rpx rgba(31, 45, 61, 0.06);
+}
+
+.mic-btn .mic-emoji {
+  font-size: 56rpx;
+  line-height: 1;
+}
+
+.mic-btn .mic-text {
+  font-size: 30rpx;
+  color: #34495e;
+}
+
+/* 录音态高亮 */
+.mic-btn.recording {
+  background: #fff6f6;
+  border-color: #ffb3b3;
+  animation: pulse 1.2s infinite ease-in-out;
+}
+@keyframes pulse {
+  0%   { box-shadow: 0 6rpx 18rpx rgba(255, 102, 102, 0.20); }
+  50%  { box-shadow: 0 10rpx 26rpx rgba(255, 102, 102, 0.32); }
+  100% { box-shadow: 0 6rpx 18rpx rgba(255, 102, 102, 0.20); }
+}
+
+/* 小提示 */
+.tip {
+  font-size: 26rpx;
+  color: #9aa5b1;
+}
+
+/* 结果卡片 */
+.card {
+  background: #ffffff;
+  border: 2rpx solid #e5e9f2;
+  border-radius: 20rpx;
+  padding: 20rpx;
+  box-shadow: 0 6rpx 18rpx rgba(31,45,61,0.05);
+}
+
+.card-title {
+  font-size: 28rpx;
+  font-weight: 600;
+  color: #334e68;
+  margin-bottom: 12rpx;
+}
+
+/* 可滚动文本区（避免长文本撑开页面） */
+.result-box {
+  max-height: 320rpx;
+  background: #f9fbfd;
+  border: 2rpx dashed #e1e8f0;
+  border-radius: 14rpx;
+  padding: 18rpx;
+}
+
+.result-text {
+  font-size: 30rpx;
+  color: #2f3b52;
+  line-height: 1.6;
+  word-break: break-all;
+}
+
+/* 四个操作按钮 */
+.actions {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 20rpx;
+  margin-top: 8rpx;
+}
+
+.btn {
+  padding: 22rpx 0;
+  font-size: 30rpx;
+  border-radius: 16rpx;
+  border: none;
+  color: #fff;
+}
+
+.btn.ghost {
+  background: #a0aec0;
+}
+
+.btn.ok {
+  background: #22c55e;   /* 绿色 */
+}
+
+.btn.save {
+  background: #3b82f6;   /* 蓝色 */
+}
+
+.btn.speak {
+  background: #f59e0b;   /* 橙色 */
+}
+
+/* 按钮按压反馈 */
+.btn:active {
+  transform: translateY(2rpx);
+  opacity: 0.92;
+}

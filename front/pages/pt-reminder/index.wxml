@@ -1,0 +1,23 @@
+<view class="container">
+  <!-- 顶部导航栏 -->
+  <view class="navbar">
+    <view class="back-btn" bindtap="onBack">
+      <image src="../../images/icon/返回 .png" class="back-icon"></image>
+    </view>
+    <text class="nav-title">听提醒</text>
+  </view>
+
+ 
+
+  <!-- 主内容区域 -->
+  <view class="main-content">
+    <view style="margin-bottom: 40px;">
+     <image src="/images/icon/喇叭.png" class="icon-with-border-mic" style="width:120px;height:120px;" />
+    </view>
+    <view class="reminder-card" bindtap="playReminder">
+      <text class="reminder-label">村医提醒：</text>
+      <text class="reminder-content">{{reminderContent}}</text>
+      <text class="reminder-status" wx:if="{{hasListened}}">已听</text>
+    </view>
+  </view>
+</view>

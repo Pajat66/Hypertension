@@ -1,0 +1,21 @@
+
+.input-field {
+  width: 100%;
+  border: none;
+  outline: none;
+  font-size: 18px;
+  margin-top: 8px;
+  padding: 6px 0;
+}
+
+.card {
+  margin: 6px 8px;
+}
+.page-title {
+  display: block;
+  text-align: center;
+  font-size: 60rpx;   /* 更大 */
+  font-weight: 900;   /* 更粗，700 是常规粗体，900 是特粗 */
+  margin-bottom: 30rpx;
+  color: #222;
+}

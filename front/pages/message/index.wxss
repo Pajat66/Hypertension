@@ -1,0 +1,244 @@
+/* 页面整体样式 */
+.container {
+  display: flex;
+  flex-direction: column;
+  background-color: #f0fffd;
+  min-height: 100vh;
+  padding: 100rpx 20rpx;
+  box-sizing: border-box;
+}
+
+/* 顶部导航栏 */
+.header {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  width: 100%;
+  margin-bottom: 60rpx;
+  position: relative;
+}
+
+.back-icon {
+  width: 60rpx;
+  height: 60rpx;
+  position: absolute;
+  left: 30rpx;
+}
+
+.title {
+  font-size: 56rpx;
+  font-weight: 700;
+  color: #222;
+}
+
+/* 消息列表容器 */
+.message-list {
+  width: 100%;
+}
+
+/* 单个患者消息项：横向布局，模拟微信会话列表 */
+.patient-message-item {
+  width: 100%;
+  display: flex;
+  align-items: center;
+  padding: 25rpx 20rpx;
+  margin-bottom: 20rpx;
+  background-color: #fff;
+  border-radius: 20rpx;
+  box-shadow: 0 2rpx 8rpx rgba(0, 0, 0, 0.05);
+}
+
+/* 患者头像 */
+.patient-avatar {
+  width: 100rpx;
+  height: 100rpx;
+  margin-right: 30rpx;
+  flex-shrink: 0;
+}
+
+.patient-avatar image {
+  width: 100%;
+  height: 100%;
+  border-radius: 50%;
+}
+
+/* 消息信息区：占满剩余空间 */
+.message-info {
+  flex: 1;
+  overflow: hidden; /* 防止长文本溢出 */
+}
+
+/* 消息顶部：姓名+时间 */
+.message-top {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 10rpx;
+}
+
+.patient-name {
+  font-size: 36rpx;
+  font-weight: 700;
+  color: #000;
+  white-space: nowrap; /* 姓名不换行 */
+}
+
+.message-time {
+  font-size: 24rpx;
+  color: #999;
+}
+
+/* 消息内容：长文本省略 */
+.message-content {
+  font-size: 30rpx;
+  color: #666;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis; /* 超出部分显示省略号 */
+}
+
+/* 喇叭图标：播放语音 */
+.speaker-icon {
+  width: 40rpx;
+  height: 40rpx;
+  margin-left: 20rpx;
+  flex-shrink: 0;
+}/* 页面容器：与其他页面统一顶部内边距 */
+.container {
+  display: flex;
+  flex-direction: column;
+  background-color: #f0fffd;
+  min-height: 100vh;
+  padding: 100rpx 20rpx; /* 与批量提醒、血压历史页面顶部留白一致 */
+  box-sizing: border-box;
+}
+
+/* 顶部导航：标题尺寸与其他页面统一 */
+.header {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  width: 100%;
+  margin-bottom: 60rpx; /* 与下方内容间距统一 */
+  position: relative;
+}
+
+.back-icon {
+  width: 60rpx;
+  height: 60rpx; /* 返回图标尺寸与其他页面一致 */
+  position: absolute;
+  left: 30rpx;
+}
+
+.title {
+  font-size: 56rpx; /* 标题文字大小：与批量提醒、患者管理页面标题一致 */
+  font-weight: 700;
+  color: #222;
+}
+
+/* 消息列表容器 */
+.message-list {
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  align-items: center; /* 消息框居中显示 */
+}
+
+/* 消息项框：宽度与其他页面卡片一致（520rpx） */
+.patient-message-item {
+  width: 520rpx; /* 与患者管理页面的患者项、批量提醒的浅框宽度一致 */
+  display: flex;
+  align-items: center;
+  padding: 30rpx; /* 内边距与其他卡片一致 */
+  margin-bottom: 30rpx; /* 消息项间距统一 */
+  background-color: #fff; /* 背景色与批量提醒的浅框一致 */
+  border-radius: 12px; /* 圆角与其他卡片一致 */
+  border: 1rpx solid #e5e5e5; /* 浅边框与批量提醒的框一致 */
+  box-sizing: border-box;
+}
+
+/* 患者头像 */
+.patient-avatar {
+  position: relative;
+  width: 90rpx;
+  height: 90rpx;
+  margin-right: 25rpx;
+  flex-shrink: 0;
+}
+
+.patient-avatar image {
+  width: 100%;
+  height: 100%;
+  border-radius: 50%;
+}
+
+/* 未读消息徽章 */
+.unread-badge {
+  position: absolute;
+  top: -5px;
+  right: -5px;
+  min-width: 30px;
+  height: 30px;
+  line-height: 30px;
+  text-align: center;
+  background-color: #ff4757;
+  color: #fff;
+  border-radius: 15px;
+  font-size: 22rpx;
+  padding: 0 8rpx;
+}
+
+/* 消息信息区 */
+.message-info {
+  flex: 1;
+  overflow: hidden;
+}
+
+.message-top {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 10rpx;
+}
+
+/* 患者姓名：与患者管理页面的患者姓名字体一致 */
+.patient-name {
+  font-size: 56rpx; /* 56rpx = 28px，与患者管理页面姓名大小一致 */
+  font-weight: 700;
+  color: #000;
+  white-space: nowrap;
+}
+
+/* 消息时间：辅助文字大小统一 */
+.message-time {
+  font-size: 28rpx;
+  color: #999;
+}
+
+/* 消息内容：与血压信息文字大小一致 */
+.message-content {
+  font-size: 44rpx; /* 44rpx = 22px，与血压数值文字大小一致 */
+  color: #666;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+/* 喇叭图标：与其他页面喇叭尺寸一致 */
+.speaker-icon {
+  width: 38rpx; /* 与批量提醒、患者管理页面的喇叭图标大小一致 */
+  height: 38rpx;
+  margin-left: 20rpx;
+  flex-shrink: 0;
+}
+
+/* 空状态和加载状态 */
+.empty-state,
+.loading-state {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  padding: 100rpx 20rpx;
+  font-size: 56rpx;
+  color: #999;
+}

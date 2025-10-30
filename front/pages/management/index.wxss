@@ -1,0 +1,221 @@
+.container {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  background-color: #f0fffd;
+  min-height: 100vh;
+  padding: 100rpx 20rpx;
+  box-sizing: border-box;
+}
+
+.header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  width: 100%;
+  margin-bottom: 60rpx;
+  padding: 0 20rpx;
+}
+
+.back-icon {
+  width: 60rpx;
+  height: 60rpx;
+}
+
+.title {
+  font-size: 56rpx;
+  font-weight: 700;
+  color: #222;
+  position: absolute;
+  left: 50%;
+  transform: translateX(-50%);
+}
+
+.battery {
+  width: 60rpx;
+  height: 30rpx;
+}
+
+.search-box {
+  display: flex;
+  align-items: center;
+  width: 520rpx;
+  height: 80rpx;
+  border: 1rpx solid #999;
+  border-radius: 10rpx;
+  padding: 0 20rpx;
+  margin-bottom: 40rpx;
+}
+
+.search-input {
+  flex: 1;
+  font-size: 28rpx;
+}
+
+.mic-icon {
+  width: 50rpx;
+  height: 50rpx;
+}
+
+.patient-item {
+  width: 520rpx;
+  background-color: #f6ffca;
+  border: 1px solid rgba(0,0,0,0.15);
+  border-radius: 12px;
+  padding: 15px;
+  margin-bottom: 15px;
+  display: flex;
+  align-items: center;
+  box-sizing: border-box;
+  box-shadow: inset -5px -5px 5px rgba(0, 0, 0, 0.1);
+}
+
+.patient-checkbox {
+  width: 32px;
+  height: 32px;
+  border: 2px solid #ccc;
+  border-radius: 6px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-right: 15px;
+  flex-shrink: 0;
+}
+
+.patient-checkbox-inner {
+  width: 100%;
+  height: 100%;
+  background-color: #07c160;
+  border-radius: 4px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: #fff;
+  font-size: 18px;
+  font-weight: bold;
+}
+
+.patient-info {
+  flex: 1;
+}
+
+.patient-name {
+  font-size: 28px;
+  font-weight: 700;
+  color: #000;
+  display: block;
+  margin-bottom: 6px;
+}
+
+.patient-blood-pressure {
+  font-size: 22px;
+  color: #666;
+}
+
+.red {
+  color: red;
+}
+
+.orange {
+  color: #f96500;
+}
+
+.green {
+  color: #58e106;
+}
+
+.arrow-icon {
+  width: 38rpx;
+  height: 38rpx;
+}
+
+.patient-right-icon {
+  display: flex;
+  align-items: center;
+  gap: 15rpx;
+}
+
+.speaker-icon-patient {
+  width: 38rpx;
+  height: 38rpx;
+}
+
+.dots {
+  display: flex;
+  justify-content: center;
+  margin-bottom: 40rpx;
+}
+
+.dot {
+  width: 12rpx;
+  height: 12rpx;
+  border-radius: 50%;
+  background-color: #ccc;
+  margin: 0 6rpx;
+}
+
+.dot.active {
+  background-color: #999;
+}
+
+.add-patient-btn {
+  width: 520rpx;
+  height: 120rpx;
+  background-color: #c5fffe;
+  border-radius: 20rpx;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-bottom: 30rpx;
+  position: relative;
+  box-shadow: 0 4rpx 10rpx rgba(0,0,0,0.1);
+}
+
+.btn-text {
+  font-size: 48rpx;
+  font-weight: 700;
+  color: #000;
+}
+
+.speaker-icon {
+  width: 50rpx;
+  height: 50rpx;
+  position: absolute;
+  top: 35rpx;
+  right: 40rpx;
+}
+
+.patient-message-title {
+  font-size: 40rpx;
+  font-weight: 700;
+  color: #222;
+  margin-bottom: 30rpx;
+  background-color: #c5fffe;
+  width: 100%;
+  text-align: center;
+  padding: 20rpx 0;
+  border-radius: 20rpx;
+}
+
+.patient-message-item {
+  width: 100%;
+  background-color: #d4edda;
+  border-radius: 20rpx;
+  padding: 20rpx;
+  margin-bottom: 20rpx;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.message-content {
+  font-size: 28rpx;
+  color: #333;
+  flex: 1;
+  margin-right: 20rpx;
+}
+
+.speaker-icon-small {
+  width: 40rpx;
+  height: 40rpx;
+}

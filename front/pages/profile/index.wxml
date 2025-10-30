@@ -1,0 +1,12 @@
+<view class="page">
+  <view class="card">
+    <view>后端健康检查</view>
+    <button bindtap="ping">Ping /api/ping</button>
+    <view class="muted">{{pong}}</view>
+  </view>
+
+  <view class="card">
+    <view>API 基址</view>
+    <view class="muted">{{apiBase}}</view>
+  </view>
+</view>

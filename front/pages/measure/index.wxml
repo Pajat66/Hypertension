@@ -1,0 +1,31 @@
+<view class="page">
+
+<!-- 顶部标题 -->
+<view class="title">录血压 · 语音输入</view>
+
+<!-- 麦克风按钮（开始/停止录音） -->
+<button class="mic-btn {{ isRecording ? 'recording' : '' }}" bindtap="toggleRecord">
+  <text class="mic-emoji">{{ isRecording ? "🎙" : "🎤" }}</text>
+  <text class="mic-text">{{ isRecording ? "正在录音，点击停止" : "点击开始录音" }}</text>
+</button>
+
+<!-- 录音状态提示 -->
+<view class="tip" wx:if="{{ isRecording }}">正在录音中…请清晰读出高压、低压、心率</view>
+
+<!-- 识别结果展示 -->
+<view class="card">
+  <view class="card-title">识别结果</view>
+  <scroll-view class="result-box" scroll-y="true">
+    <text class="result-text">{{ resultText || "（未识别到内容）" }}</text>
+  </scroll-view>
+</view>
+
+<!-- 操作按钮区 -->
+<view class="actions">
+  <button class="btn ghost" bindtap="retry">🔄 重说</button>
+  <button class="btn ok" bindtap="confirm">✅ 确认</button>
+  <button class="btn save" bindtap="save">💾 保存</button>
+  <button class="btn speak" bindtap="readText">🔊 朗读</button>
+</view>
+
+</view>

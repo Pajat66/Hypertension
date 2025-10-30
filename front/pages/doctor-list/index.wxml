@@ -1,0 +1,44 @@
+<view class="container">
+  <!-- 顶部导航 -->
+  <view class="header">
+    <image class="back-icon" src="../../images/icon/返回 .png" mode="widthFix" bindtap="goBack" />
+    <view class="title">选择医生</view>
+  </view>
+
+  <!-- 医生列表 -->
+  <view class="doctor-list">
+    <block wx:for="{{doctorList}}" wx:key="worker_id">
+      <view class="doctor-item" bindtap="gotoChat" data-doctor="{{item}}">
+        <!-- 医生头像 -->
+        <view class="doctor-avatar">
+          <image src="../../images/icon/医生.png" mode="widthFix" />
+          <view class="unread-badge" wx:if="{{item.unreadCount > 0}}">{{item.unreadCount}}</view>
+        </view>
+
+        <!-- 医生信息 -->
+        <view class="doctor-info">
+          <view class="doctor-top">
+            <view class="doctor-name">{{item.name}}</view>
+            <view class="message-time" wx:if="{{item.lastMessageTime}}">{{item.lastMessageTime}}</view>
+          </view>
+          <view class="doctor-role">{{item.role}}</view>
+          <view class="last-message">{{item.lastMessage}}</view>
+        </view>
+
+        <!-- 右箭头 -->
+        <image class="arrow-icon" src="../../images/icon/右箭头.png" mode="widthFix" />
+      </view>
+    </block>
+
+    <!-- 空状态 -->
+    <view class="empty-state" wx:if="{{!loading && doctorList.length === 0}}">
+      <text>暂无医生</text>
+    </view>
+
+    <!-- 加载中 -->
+    <view class="loading-state" wx:if="{{loading}}">
+      <text>加载中...</text>
+    </view>
+  </view>
+</view>
+

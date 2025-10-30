@@ -1,0 +1,49 @@
+<view class="container">
+  <view class="header">
+    <image class="back-icon" src="../../images/icon/返回 .png" mode="widthFix" bindtap="goBack" />
+    <view class="title">批量提醒</view>
+  </view>
+
+  <view class="section-box patient-select-box">
+    <view class="remind-option">
+      <checkbox class="checkbox" />
+      <view class="option-text">全部患者</view>
+      <image class="speaker-icon" src="../../images/icon/喇叭.png" mode="widthFix" />
+    </view>
+    <view class="remind-option">
+      <checkbox class="checkbox" />
+      <view class="option-text">未记录血压</view>
+      <image class="speaker-icon" src="../../images/icon/喇叭.png" mode="widthFix" />
+    </view>
+    <view class="remind-option">
+      <checkbox class="checkbox" />
+      <view class="option-text">血压异常</view>
+      <image class="speaker-icon" src="../../images/icon/喇叭.png" mode="widthFix" />
+    </view>
+  </view>
+
+  <view class="section-box remind-content-box">
+    <view class="remind-content-title">选择提醒内容</view>
+    <view class="remind-content-item" bindtap="selectRemindContent">
+      <view class="content-text">明天来测血压</view>
+      <radio class="radio" checked />
+      <image class="speaker-icon-small" src="../../images/icon/喇叭.png" mode="widthFix" />
+    </view>
+    <view class="remind-content-item" bindtap="selectRemindContent">
+      <view class="content-text">该买降压药了</view>
+      <radio class="radio" />
+      <image class="speaker-icon-small" src="../../images/icon/喇叭.png" mode="widthFix" />
+    </view>
+    <view class="remind-content-item" bindtap="selectRemindContent">
+      <view class="content-text">注意身体，血压波动大</view>
+      <radio class="radio" />
+      <image class="speaker-icon-small" src="../../images/icon/喇叭.png" mode="widthFix" />
+    </view>
+    <view class="custom-content">
+      <view class="custom-text">自定义话语</view>
+      <image class="mic-icon" src="../../images/icon/麦克风.png" mode="widthFix" />
+    </view>
+  </view>
+
+  <view class="send-btn" bindtap="sendRemind">发送</view>
+</view>

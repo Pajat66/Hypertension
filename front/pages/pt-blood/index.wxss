@@ -1,0 +1,65 @@
+.container {
+  background-color: #e6f7f5;
+  min-height: 100vh;
+  padding: 100rpx 20rpx;
+  box-sizing: border-box;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: flex-start;
+}
+
+.header {
+  width: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 20rpx 0;
+  background-color: #cdf7be;
+  margin-bottom: 60rpx;
+  position: relative;
+}
+
+.back-icon {
+  width: 60rpx;
+  height: 60rpx;
+  position: absolute;
+  left: 30rpx;
+}
+
+.title {
+  font-size: 44rpx;
+  font-weight: bold;
+  color: #333;
+}
+
+.chart-canvas {
+  width: 100%;
+  height: 500rpx;
+  background-color: #fff;
+  border-radius: 10rpx;
+  margin-bottom: 80rpx; /* 增加图表与按钮间距 */
+}
+
+.dialect-btn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 400rpx;
+  height: 120rpx;
+  background-color: #cdf7be;
+  border-radius: 20rpx;
+  box-shadow: 0 4rpx 10rpx rgba(0,0,0,0.1);
+  gap: 15rpx;
+}
+
+.btn-text {
+  font-size: 36rpx;
+  font-weight: bold;
+  color: #333;
+}
+
+.speaker-icon {
+  width: 45rpx;
+  height: 45rpx;
+}

@@ -1,0 +1,51 @@
+/* app.wxss */
+page {
+  background: #eafcf8; /* 淡薄绿色背景，和图片近似 */
+  min-height: 100vh;
+  font-family: "PingFang SC", "Helvetica Neue", Arial, sans-serif;
+  color: #222;
+}
+
+.container {
+  padding: 18px;
+}
+
+/* 通用按钮样式 */
+.big-btn {
+  background: #dff3e9;
+  border-radius: 8px;
+  border: 1px solid rgba(0,0,0,0.08);
+  height: 100px;
+  line-height: 100px;
+  text-align: center;
+  font-size: 36px;
+  font-weight: 600;
+  box-shadow: 0 2px 0 rgba(0,0,0,0.03) inset;
+}
+.card {
+  background: #ffffff;
+  border: 1px solid rgba(0,0,0,0.15);
+  border-radius: 6px;
+  padding: 16px;
+}
+.input-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+.input-left {
+  flex: 1;
+}
+.icon-right {
+  width: 44px;
+  height: 44px;
+  margin-left: 12px;
+}
+.title-large {
+  font-size: 34px;
+  font-weight: 700;
+}
+.small-sub {
+  font-size: 14px;
+  color: #666;
+}

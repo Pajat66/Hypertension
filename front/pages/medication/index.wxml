@@ -1,0 +1,30 @@
+<view class="container">
+  <!-- 顶部导航栏 -->
+  <view class="navbar">
+    <view class="back-btn" bindtap="onBack">
+      <image src="../../images/icon/返回 .png" class="back-icon"></image>
+    </view>
+    <text class="nav-title">我的用药</text>
+  </view>
+
+  <view class="tip">
+    <text >
+      快速双击听语音
+    </text>
+  </view>
+
+  <!-- 药品列表 -->
+  <view class="medication-list">
+    <view class="medication-card" wx:for="{{medications}}" wx:key="id" data-id="{{item.id}}" bindtap="toggleMedicationStatus">
+      <view class="checkbox">
+        <view class="checkbox-inner" wx:if="{{item.isTaken}}">
+          <text>✓</text>
+        </view>
+      </view>
+      <view class="medication-info">
+        <text class="medication-name">{{item.name}}</text>
+        <text class="medication-detail">{{item.time}} · {{item.dosage}}</text>
+      </view>
+    </view>
+  </view>
+</view>

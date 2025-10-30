@@ -1,0 +1,36 @@
+<view class="container">
+  <!-- 顶部导航 -->
+  <view class="header">
+    <image class="back-icon" src="../../images/icon/返回 .png" mode="widthFix" bindtap="goBack" />
+    <view class="title">患者消息</view>
+  </view>
+
+  <!-- 消息列表 -->
+  <view class="message-list">
+    <block wx:for="{{patientList}}" wx:key="user_id">
+      <view class="patient-message-item" bindtap="gotoChat" data-patient="{{item}}">
+        <view class="patient-avatar">
+          <image src="../../images/icon/患者.png" mode="widthFix" />
+          <view class="unread-badge" wx:if="{{item.unreadCount > 0}}">{{item.unreadCount}}</view>
+        </view>
+        <view class="message-info">
+          <view class="message-top">
+            <view class="patient-name">{{item.name}}</view>
+            <view class="message-time" wx:if="{{item.lastMessageTime}}">{{item.lastMessageTime}}</view>
+          </view>
+          <view class="message-content">{{item.lastMessage || '暂无消息'}}</view>
+        </view>
+      </view>
+    </block>
+
+    <!-- 空状态 -->
+    <view class="empty-state" wx:if="{{!loading && patientList.length === 0}}">
+      <text>暂无患者消息</text>
+    </view>
+
+    <!-- 加载中 -->
+    <view class="loading-state" wx:if="{{loading}}">
+      <text>加载中...</text>
+    </view>
+  </view>
+</view>

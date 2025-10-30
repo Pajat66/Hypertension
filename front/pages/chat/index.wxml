@@ -1,0 +1,47 @@
+<view class="container">
+  <!-- 顶部导航（显示当前聊天的患者姓名） -->
+  <view class="header">
+    <image class="back-icon" src="../../images/icon/返回 .png" mode="widthFix" bindtap="goBack" />
+    <view class="title">{{currentPatient.name}}</view>
+  </view>
+
+  <!-- 聊天消息列表（可滚动） -->
+  <scroll-view class="message-list" scroll-y scroll-with-animation scroll-top="{{scrollTop}}">
+    <!-- 循环渲染消息列表 -->
+    <block wx:for="{{messageList}}" wx:key="index">
+      <!-- 患者消息（左对齐） -->
+      <view class="message-item patient-message" wx:if="{{item.type === 'patient'}}">
+        <view class="avatar">
+          <image src="{{currentPatient.avatar || '../../images/icon/患者.png'}}" mode="widthFix" />
+        </view>
+        <view class="message-content-wrap">
+          <view class="message-content">{{item.content}}</view>
+          <view class="message-time">{{item.time}}</view>
+        </view>
+      </view>
+
+      <!-- 村医回复（右对齐） -->
+      <view class="message-item doctor-message" wx:else>
+        <view class="message-content-wrap">
+          <view class="message-content">{{item.content}}</view>
+          <view class="message-time">{{item.time}}</view>
+        </view>
+        <view class="avatar">
+          <image src="../../images/icon/医生.png" mode="widthFix" />
+        </view>
+      </view>
+    </block>
+  </scroll-view>
+
+  <!-- 回复输入区（固定底部） -->
+  <view class="reply-bar">
+    <input 
+      class="reply-input" 
+      placeholder="输入回复..." 
+      value="{{replyContent}}"
+      bindinput="onInput"
+      bindconfirm="sendMessage"
+    />
+    <button class="send-btn" bindtap="sendMessage">发送</button>
+  </view>
+</view>

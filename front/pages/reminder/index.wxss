@@ -1,0 +1,144 @@
+.container {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  background-color: #f0fffd;
+  min-height: 100vh;
+  padding: 40rpx 20rpx; /* 减小顶部内边距，避免内容溢出 */
+  box-sizing: border-box;
+  gap: 20rpx; /* 优化元素间距 */
+}
+
+.header {
+  display: flex;
+  justify-content: center; /* 标题自然居中 */
+  align-items: center;
+  width: 100%;
+  margin-bottom: 40rpx;
+  padding: 0 20rpx;
+  position: relative; /* 作为返回图标的定位基准 */
+}
+
+.back-icon {
+  position: absolute;
+  left: 20rpx; /* 固定在头部左侧 */
+  width: 60rpx;
+  height: 60rpx;
+}
+
+.title {
+  font-size: 56rpx;
+  font-weight: 700;
+  color: #222;
+  /* 移除绝对定位，避免遮挡 */
+}
+
+/* 浅框样式 */
+.section-box {
+  width: 520rpx;
+  border: 1rpx solid #e5e5e5;
+  background-color: #fff;
+  border-radius: 12px;
+  padding: 20rpx;
+  box-sizing: border-box;
+}
+
+.patient-select-box {
+  margin-bottom: 0;
+}
+
+.remind-content-box {
+  margin-bottom: 40rpx;
+}
+
+.remind-option {
+  width: 100%;
+  display: flex;
+  align-items: center;
+  margin-bottom: 30rpx;
+}
+
+/* 统一为rpx单位，适配不同设备 */
+.checkbox {
+  width: 32rpx;
+  height: 32rpx;
+  margin-right: 15rpx;
+}
+
+.option-text {
+  font-size: 56rpx;
+  color: #000;
+  font-weight: 700;
+  flex: 1;
+}
+
+.speaker-icon {
+  width: 38rpx;
+  height: 38rpx;
+}
+
+.remind-content-title {
+  font-size: 56rpx;
+  font-weight: 700;
+  color: #333;
+  margin-bottom: 30rpx;
+}
+
+.remind-content-item {
+  width: 100%;
+  display: flex;
+  align-items: center;
+  margin-bottom: 25rpx;
+}
+
+.content-text {
+  font-size: 44rpx;
+  color: #333;
+  flex: 1;
+  margin-right: 15rpx;
+}
+
+/* 统一为rpx单位 */
+.radio {
+  width: 32rpx;
+  height: 32rpx;
+  margin-right: 15rpx;
+}
+
+.speaker-icon-small {
+  width: 38rpx;
+  height: 38rpx;
+}
+
+.custom-content {
+  width: 100%;
+  display: flex;
+  align-items: center;
+  margin-top: 10rpx;
+}
+
+.custom-text {
+  font-size: 44rpx;
+  color: #333;
+  flex: 1;
+  margin-right: 15rpx;
+}
+
+.mic-icon {
+  width: 38rpx;
+  height: 38rpx;
+}
+
+.send-btn {
+  width: 520rpx;
+  height: 120rpx;
+  background-color: #c5fffe;
+  border-radius: 20rpx;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 48rpx;
+  font-weight: 700;
+  color: #000;
+  box-shadow: 0 4rpx 10rpx rgba(0,0,0,0.1);
+}

@@ -1,0 +1,44 @@
+
+<view class="container">
+  <view style="height: 28px;"></view>
+  <text src="" style="width:260px;height:72px;display:block;margin:0 auto 18px auto;"></text>
+  <text class="page-title">适农高血压管理系统</text>
+
+  <view class="card" style="padding:18px;">
+    <view class="input-row" style="margin-bottom:18px;">
+      <view class="input-left">
+        <text style="font-size:30px;font-weight:700;">姓名</text>
+        <input placeholder="请输入姓名" bindinput="onInputName" value="{{name}}" class="input-field" />
+      </view>
+      <image class="icon-right" src="/images/icon/麦克风.png" bindtap="onTapMicName" />
+    </view>
+
+    <view class="input-row" style="margin-bottom:18px;">
+      <view class="input-left">
+        <text style="font-size:30px;font-weight:700;">手机号</text>
+        <input placeholder="请输入手机号" bindinput="onInputPhone" value="{{phone}}" class="input-field" />
+      </view>
+      <image class="icon-right" src="/images/icon/麦克风.png" bindtap="onTapMicPhone" />
+    </view>
+
+    <view class="input-row" style="margin-bottom:6px;">
+      <view class="input-left">
+        <text style="font-size:30px;font-weight:700;">密码</text>
+        <input placeholder="请输入密码" password="true" bindinput="onInputPassword" value="{{password}}" class="input-field" />
+      </view>
+      <image class="icon-right" src="/images/icon/麦克风.png" bindtap="onTapMicPassword" />
+    </view>
+
+    <view style="margin-top:12px;color:#333;">
+      <text>首次使用请进行注册</text>
+    </view>
+
+    <view style="margin-top:18px;">
+      <view class="big-btn" bindtap="onLogin">登录</view>
+    </view>
+
+    <view style="margin-top:20px;text-align:center;">
+      <navigator url="/pages/pt-register/index">去注册</navigator>
+    </view>
+  </view>
+</view>

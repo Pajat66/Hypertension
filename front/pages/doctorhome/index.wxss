@@ -1,0 +1,98 @@
+.container {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  background-color: #f0fffd;
+  min-height: 100vh;
+  padding: 100rpx 20rpx;
+  box-sizing: border-box;
+}
+
+.header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  width: 100%;
+  margin-bottom: 60rpx;
+}
+
+.time, .network {
+  font-size: 32rpx; /* 辅助文字放大 */
+  color: #333;
+}
+
+.battery {
+  width: 70rpx; /* 电池图标同步放大 */
+  height: 35rpx;
+}
+
+.name {
+  font-size: 64rpx; /* 姓名字体放大 */
+  font-weight: 700;
+  color: #222;
+  margin-bottom: 60rpx;
+}
+
+/* 统计容器：宽度收窄，整体居中 */
+.stats {
+  display: flex;
+  flex-direction: column;
+  width: 80%; /* 不再占满屏幕，避免文字间距过大 */
+  margin-bottom: 80rpx;
+}
+
+/* 统计项：文字居中，缩小间距 */
+.stat-item {
+  display: flex;
+  align-items: center;
+  justify-content: center; /* 整体居中 */
+  gap: 20rpx; /* 标签与数值间距缩小（原默认间距过大） */
+  margin-bottom: 50rpx; /* 统计项之间间距放大，更清晰 */
+}
+
+/* 统计文字：整体放大 */
+.stat-label {
+  font-size: 52rpx; /* 标签字体放大 */
+  color: #333;
+  font-weight: 600;
+}
+
+.stat-value {
+  font-size: 52rpx; /* 数值字体放大，与标签同大 */
+  color: #000;
+  font-weight: 700;
+}
+
+.red {
+  color: red;
+}
+
+/* 按钮：尺寸放大，匹配视觉需求 */
+.btn {
+  width: 650rpx; /* 按钮宽度放大 */
+  height: 150rpx; /* 按钮高度放大 */
+  background-color: #c5fffe;
+  border-radius: 25rpx; /* 圆角同步放大 */
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-bottom: 50rpx; /* 按钮间距放大 */
+  position: relative;
+  box-shadow: 0 6rpx 15rpx rgba(0,0,0,0.1); /* 阴影加深，更立体 */
+}
+
+/* 喇叭图标：随按钮放大同步调整 */
+.speaker-icon {
+  width: 50rpx;
+  height: 50rpx;
+  position: absolute;
+  top: 50rpx; /* 居中调整 */
+  right: 50rpx; /* 右间距放大 */
+}
+
+/* 按钮文字：放大，更醒目 */
+.btn-text {
+  font-size: 52rpx; /* 按钮文字放大 */
+  font-weight: 700;
+  color: #000;
+}

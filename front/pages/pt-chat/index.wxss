@@ -1,0 +1,143 @@
+.container {
+  display: flex;
+  flex-direction: column;
+  background-color: #f5f5f5;
+  min-height: 100vh;
+  padding-bottom: 120rpx;
+  box-sizing: border-box;
+}
+
+/* 顶部导航：突出医生身份 */
+.header {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  height: 120rpx;
+  background-color: #c5fffe; /* 医生相关页面用浅蓝色导航 */
+  position: relative;
+  margin-bottom: 20rpx;
+}
+
+.back-icon {
+  width: 60rpx;
+  height: 60rpx;
+  position: absolute;
+  left: 30rpx;
+}
+
+.title {
+  font-size: 44rpx;
+  font-weight: 700;
+  color: #333;
+}
+
+/* 消息列表 */
+.message-list {
+  flex: 1;
+  padding: 0 30rpx;
+}
+
+/* 消息项通用样式 */
+.message-item {
+  display: flex;
+  margin-bottom: 30rpx;
+  align-items: flex-end;
+}
+
+/* 医生消息（左对齐） */
+.doctor-message {
+  flex-direction: row;
+}
+
+/* 患者自己的消息（右对齐） */
+.patient-message {
+  flex-direction: row-reverse;
+}
+
+/* 头像 */
+.avatar {
+  width: 80rpx;
+  height: 80rpx;
+  margin-right: 20rpx;
+}
+
+.avatar image {
+  width: 100%;
+  height: 100%;
+  border-radius: 50%;
+}
+
+/* 消息内容容器 */
+.message-content-wrap {
+  max-width: 60%;
+}
+
+/* 消息气泡：颜色区分身份 */
+.message-content {
+  padding: 20rpx 25rpx;
+  border-radius: 20rpx;
+  font-size: 32rpx;
+  line-height: 1.5;
+}
+
+/* 医生消息气泡（浅蓝色，与导航呼应） */
+.doctor-message .message-content {
+  background-color: #c5fffe;
+  color: #333;
+  border-top-left-radius: 6rpx;
+}
+
+/* 患者消息气泡（浅绿色，突出患者身份） */
+.patient-message .message-content {
+  background-color: #d4edda;
+  color: #333;
+  border-top-right-radius: 6rpx;
+}
+
+/* 消息时间 */
+.message-time {
+  font-size: 22rpx;
+  color: #999;
+  margin-top: 8rpx;
+  text-align: left;
+}
+
+.patient-message .message-time {
+  text-align: right;
+}
+
+/* 输入区：患者提问场景 */
+.reply-bar {
+  position: fixed;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  display: flex;
+  align-items: center;
+  padding: 20rpx 30rpx;
+  background-color: #fff;
+  border-top: 1rpx solid #eee;
+}
+
+.reply-input {
+  flex: 1;
+  height: 80rpx;
+  background-color: #f5f5f5;
+  border-radius: 40rpx;
+  padding: 0 30rpx;
+  font-size: 32rpx;
+  margin-right: 20rpx;
+}
+
+.send-btn {
+  width: 120rpx;
+  height: 80rpx;
+  background-color: #d4edda; /* 患者侧按钮用浅绿色 */
+  color: #333;
+  font-size: 32rpx;
+  font-weight: 700;
+  border-radius: 40rpx;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}

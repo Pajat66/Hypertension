@@ -1,0 +1,27 @@
+<!-- pages/index/index.wxml -->
+<view class="container">
+  <view style="height: 28px;"></view> <!-- 与登录页保持一致的顶部间距 -->
+  <view class="title">适农高血压管理系统</view>
+  <view class="subtitle">用家乡话就能管理血压，方便又简单</view>
+
+  <view class="tip">请选择您的身份</view>
+
+  <view class="entry-btn" bindtap="gotoPatient">
+    <image class="icon" src="../../images/icon/高血压随访.png" mode="widthFix" />
+    <image class="speaker" src="../../images/icon/喇叭.png" mode="widthFix" />
+    <view class="btn-title">患者入口</view>
+    <view class="btn-subtitle">用方言说话就能记录血压、用药情况</view>
+  </view>
+
+  <view class="entry-btn" bindtap="gotoDoctor">
+    <image class="icon" src="../../images/icon/医生认证.png" mode="widthFix" />
+    <image class="speaker" src="../../images/icon/喇叭.png" mode="widthFix" />
+    <view class="btn-title">村医入口</view>
+    <view class="btn-subtitle">患者管理、发提醒</view>
+  </view>
+
+  <view class="help">
+    <text class="help-text">？如何使用语言功能</text>
+    <text class="system-name">适农高血压语音交互智能管理系统</text>
+  </view>
+</view>

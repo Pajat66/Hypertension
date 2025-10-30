@@ -1,0 +1,5 @@
+{
+  "navigationBarTitleText": "患者消息",
+  "navigationStyle": "custom",
+  "enablePullDownRefresh": true
+}

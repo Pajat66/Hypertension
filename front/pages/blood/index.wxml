@@ -1,0 +1,16 @@
+<view class="container">
+  <view class="header">
+    <image class="back-icon" src="../../images/icon/返回 .png" mode="widthFix" bindtap="goBack" />
+    <view class="title">血压历史</view>
+  </view>
+
+  <view class="patient-name">张三</view>
+
+  <canvas canvas-id="bpChart" class="chart-canvas"></canvas>
+
+  <!-- 听方言解读按钮：拆分文字和喇叭图标，分别绑定事件 -->
+  <view class="dialect-btn">
+    <text class="btn-text" bindtap="playDialect">听方言解读</text>
+    <image class="speaker-icon" src="../../images/icon/喇叭.png" mode="widthFix" bindtap="playVoice" />
+  </view>
+</view>

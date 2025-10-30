@@ -1,0 +1,48 @@
+<view class="container">
+  <view class="header">
+    <image class="back-icon" src="../../images/icon/返回 .png" mode="widthFix" bindtap="goBack" />
+    <view class="title">患者管理</view>
+  </view>
+  <view class="search-box">
+    <input class="search-input" placeholder="搜索患者姓名" />
+    <image class="mic-icon" src="../../images/icon/麦克风.png" mode="widthFix" />
+  </view>
+  <view class="patient-item" bindtap="gotoPatientDetail">
+    <view>
+      <view class="patient-name">张三</view>
+      <view class="patient-blood-pressure">最新血压 <text class="red">145/80 mmHg</text></view>
+    </view>
+    <view class="patient-right-icon">
+      <image class="speaker-icon-patient" src="../../images/icon/喇叭.png" mode="widthFix" bindtap="playPatientMessage" />
+      <image class="arrow-icon" src="../../images/icon/右箭头.png" mode="widthFix" />
+    </view>
+  </view>
+  <view class="patient-item" bindtap="gotoPatientDetail">
+    <view>
+      <view class="patient-name">李四</view>
+      <view class="patient-blood-pressure">最新血压 <text class="orange">138/79 mmHg</text></view>
+    </view>
+    <view class="patient-right-icon">
+      <image class="speaker-icon-patient" src="../../images/icon/喇叭.png" mode="widthFix" bindtap="playPatientMessage" />
+      <image class="arrow-icon" src="../../images/icon/右箭头.png" mode="widthFix" />
+    </view>
+  </view>
+  <view class="dots">
+    <view class="dot active"></view>
+    <view class="dot"></view>
+    <view class="dot"></view>
+    <view class="dot"></view>
+    <view class="dot"></view>
+    <view class="dot"></view>
+  </view>
+  <!-- 调整后：添加患者按钮在上 -->
+  <view class="add-patient-btn" bindtap="addPatient">
+    <view class="btn-text">+添加患者</view>
+    <image class="speaker-icon" src="../../images/icon/喇叭.png" mode="widthFix" />
+  </view>
+  <!-- 调整后：患者消息按钮在下 -->
+  <view class="add-patient-btn" bindtap="gotoPatientMessage">
+    <view class="btn-text">患者消息</view>
+    <image class="speaker-icon" src="../../images/icon/喇叭.png" mode="widthFix" />
+  </view>
+</view>
