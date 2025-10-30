@@ -1,9 +1,12 @@
 <view class="container">
   <view style="height: 8px;"></view>
-  <text style="width:260px;height:72px;display:block;margin:0 auto 18px auto;"></text>
+  <text style="width:260px;height:100px;display:block;margin:0 auto 18px auto;"></text>
   <view style="padding-left:12px;">
-    <text style="font-size:22px;font-weight:700;">姓名</text>
+    <text style="font-size:35px;font-weight:700;">{{displayName || '姓名'}}</text>
   </view>
+
+<!-- 退出登录悬浮按钮（患者） -->
+<button class="logout-fab" bindtap="handleLogoutTap" hover-class="logout-fab--hover">退出</button>
 
   <!-- 大卡片按钮组 -->
   <view style="padding:12px;">

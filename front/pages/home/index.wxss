@@ -1,1 +1,51 @@
 /* pages/home/index.wxss */
+
+.container {
+  position: relative;
+}
+
+
+
+
+.logout-chip--hover {
+  background: #f7f7f7;
+}
+
+
+/* --- refined placement near name --- */
+.name-row { position: relative; padding-left: 24rpx; margin: 12rpx 0 8rpx; }
+.name-text { font-size: 28rpx; font-weight: 700; color: #333; }
+
+/* Hide any stray logout buttons not inside name-row */
+.container > .logout-chip { display: none; }
+
+.name-row{
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  position: absolute;
+  left: 0;
+  top: -30rpx; /* slightly above the name */
+  z-index: 10;
+  padding: 16rpx 36rpx; /* larger pill */
+  border-radius: 999rpx;
+  background: #ffffff;
+  color: #333;
+  font-size: 30rpx;
+  border: 2rpx solid #e8e8e8;
+  box-shadow: 0 8rpx 20rpx rgba(0,0,0,0.08);
+}
+.logout-fab {
+  position: fixed;
+  top: 100rpx;
+  left: 24rpx;
+  z-index: 1000;
+  padding: 24rpx 48rpx;
+  border-radius: 999rpx;
+  background: #ffffff;
+  color: #222;
+  font-size: 42rpx;
+  font-weight: 800;
+  border: 2rpx solid #e8e8e8;
+  box-shadow: 0 8rpx 20rpx rgba(0,0,0,0.08);
+}
