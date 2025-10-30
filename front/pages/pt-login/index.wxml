@@ -1,5 +1,6 @@
 
 <view class="container">
+  <button class="identity-chip" bindtap="goChooseIdentity" hover-class="identity-chip--hover">重新选择身份</button>
   <view style="height: 28px;"></view>
   <text src="" style="width:260px;height:72px;display:block;margin:0 auto 18px auto;"></text>
   <text class="page-title">适农高血压管理系统</text>

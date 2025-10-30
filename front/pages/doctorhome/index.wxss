@@ -96,3 +96,46 @@
   font-weight: 700;
   color: #000;
 }
+
+/* Wrap name and logout chip */
+.name-row { position: relative; width: 100%; }
+
+/* Hide stray button placed outside the container */
+.container + .logout-chip { display: none; }
+
+.logout-chip--hover { background: #f7f7f7; }
+
+/* Larger pill, slightly above the name */
+.name{
+  font-size: 35px;
+}
+.name-row {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  position: absolute;
+  left: 24rpx;
+  top: -30rpx;
+  z-index: 10;
+  padding: 16rpx 36rpx;
+  border-radius: 999rpx;
+  background: #ffffff;
+  color: #333;
+  font-size: 30rpx;
+  border: 2rpx solid #e8e8e8;
+  box-shadow: 0 8rpx 20rpx rgba(0,0,0,0.08);
+}
+.logout-chip {
+  position: fixed;
+  top: 200rpx;
+  left: 24rpx;
+  z-index: 1000;
+  padding: 24rpx 48rpx;
+  border-radius: 999rpx;
+  background: #ffffff;
+  color: #222;
+  font-size: 45rpx;
+  font-weight: 800;
+  border: 2rpx solid #e8e8e8;
+  box-shadow: 0 8rpx 20rpx rgba(0,0,0,0.08);
+}
