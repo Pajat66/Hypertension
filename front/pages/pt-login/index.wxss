@@ -19,3 +19,20 @@
   margin-bottom: 30rpx;
   color: #222;
 }
+/* ����ѡ�����ݰ�ť�����Ͻǣ���Ҫ̫���ϣ� */
+.identity-chip {
+  position: fixed;
+  top: 100rpx;
+  left: 24rpx;
+  z-index: 1000;
+  padding: 18rpx 36rpx;
+  border-radius: 999rpx;
+  background: #ffffff;
+  color: #222;
+  font-size: 32rpx;
+  font-weight: 800;
+  border: 2rpx solid #e8e8e8;
+  box-shadow: 0 8rpx 20rpx rgba(0,0,0,0.08);
+}
+
+.identity-chip--hover { background: #f7f7f7; }

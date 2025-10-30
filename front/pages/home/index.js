@@ -1,4 +1,19 @@
+const { logout } = require('../../utils/auth')
+
 Page({
+  data: {
+    displayName: ''
+  },
+
+  onShow() {
+    try {
+      const user = wx.getStorageSync('userInfo') || {}
+      const name = user.name || user.username || user.realname || user.nick || user.phone || ''
+      this.setData({ displayName: name })
+    } catch (_) {
+      this.setData({ displayName: '' })
+    }
+  },
   // 跳转到血压录入页面
   onTapMicBp() {
     wx.navigateTo({
@@ -35,5 +50,20 @@ Page({
       // 路径对应“血压历史”页面的文件路径（blood）
       url: `/pages/blood/index?patientName=${patientName}`
     });
+  },
+
+  // 退出登录（患者）
+  handleLogoutTap() {
+    wx.showModal({
+      title: '确认退出',
+      content: '退出后需要重新登录',
+      confirmText: '退出',
+      confirmColor: '#ff6b6b',
+      success(res) {
+        if (res.confirm) {
+          logout({ loginPath: '/pages/pt-login/index' })
+        }
+      }
+    })
   }
 });
