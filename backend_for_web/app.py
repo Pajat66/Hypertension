@@ -4,11 +4,15 @@ import os
 import re
 import uuid
 from typing import Optional, Tuple
-from datetime import datetime, timezone
+from datetime import datetime, timezone, timedelta
 
 from flask import Flask, jsonify, send_from_directory, request
 from flask_cors import CORS
-from models import db, Patient, Doctor, BpRecord, Medicine, DocMsg, Reminder, ChatMessage, GenderEnum, MethodEnum, PlanTypeEnum, ChannelEnum
+from models import (
+    db, Patient, Doctor, BpRecord, Medicine, DocMsg, Reminder, ChatMessage, 
+    DoctorReminder, PatientReminder,
+    GenderEnum, MethodEnum, PlanTypeEnum, ChannelEnum
+)
 
 # 讯飞 ASR/TTS（无 pydub 版，基于 ffmpeg 转码）
 # 文件需与 app.py 
@@ -25,19 +29,52 @@ class Config:
     SQLALCHEMY_TRACK_MODIFICATIONS = False
 
 
+def cleanup_old_audio_files():
+    """清理超过30天的音频文件"""
+    try:
+        cutoff_date = datetime.now(timezone.utc) - timedelta(days=30)
+        old_reminders = PatientReminder.query.filter(
+            PatientReminder.created_at < cutoff_date,
+            PatientReminder.is_listened == True  # 只清理已听过的
+        ).all()
+        
+        cleaned_count = 0
+        for reminder in old_reminders:
+            if reminder.audio_path:
+                try:
+                    file_path = os.path.join(os.path.dirname(__file__), reminder.audio_path.lstrip('/'))
+                    if os.path.exists(file_path):
+                        os.remove(file_path)
+                        cleaned_count += 1
+                except Exception as e:
+                    print(f"清理音频文件失败: {e}")
+        print(f"成功清理 {cleaned_count} 个过期音频文件")
+    except Exception as e:
+        print(f"执行清理任务失败: {e}")
+
 def create_app():
     app = Flask(__name__, static_folder="static", static_url_path="/")
     app.config.from_object(Config)
 
-    # 仅放开 /api/* 的跨域
-    FRONTEND_ORIGINS = os.environ.get(
-        "FRONTEND_ORIGINS",
-        "http://localhost:5173,https://your-frontend.com"
-    )
-    origins = [o.strip() for o in FRONTEND_ORIGINS.split(",") if o.strip()]
-    CORS(app, resources={r"/api/*": {"origins": origins}}, supports_credentials=False)
+    # 允许所有路由的跨域访问
+    CORS(app, resources={r"/*": {
+        "origins": "*",
+        "methods": ["GET", "POST", "PUT", "DELETE", "OPTIONS"],
+        "allow_headers": ["Content-Type", "Authorization"]
+    }}, supports_credentials=False)
 
     db.init_app(app)
+    
+    # 注册定时清理任务
+    if not app.debug:
+        def run_cleanup():
+            with app.app_context():
+                cleanup_old_audio_files()
+                
+        from apscheduler.schedulers.background import BackgroundScheduler
+        scheduler = BackgroundScheduler()
+        scheduler.add_job(run_cleanup, 'cron', hour=3)  # 每天凌晨3点执行
+        scheduler.start()
 
     static_dir = os.path.join(app.root_path, "static")
     os.makedirs(static_dir, exist_ok=True)
@@ -338,10 +375,10 @@ def create_app():
         
         return jsonify({"ok": True, "reminder": reminder.to_dict()})
 
-    # 获取患者提醒API
-    @app.route("/api/patients/<int:user_id>/reminders")
-    def get_reminders(user_id):
-        """获取患者的提醒记录"""
+    # 获取患者定时提醒API (计划任务提醒)
+    @app.route("/api/patients/<int:user_id>/scheduled_reminders")
+    def get_scheduled_reminders(user_id):
+        """获取患者的定时提醒记录"""
         reminders = Reminder.query.filter_by(user_id=user_id).order_by(Reminder.created_at.desc()).all()
         return jsonify([r.to_dict() for r in reminders])
 
@@ -351,6 +388,14 @@ def create_app():
         """获取所有医生"""
         doctors = Doctor.query.order_by(Doctor.worker_id.desc()).all()
         return jsonify([d.to_dict() for d in doctors])
+        
+    @app.route("/api/doctors/<int:doctor_id>")
+    def get_doctor(doctor_id):
+        """获取单个医生的详细信息"""
+        doctor = Doctor.query.get(doctor_id)
+        if not doctor:
+            return jsonify({"error": "医生不存在"}), 404
+        return jsonify({"ok": True, "doctor": doctor.to_dict()})
 
     @app.route("/api/doctors", methods=["POST"])
     def create_doctor():
@@ -370,10 +415,11 @@ def create_app():
         return jsonify({"ok": True, "doctor": doctor.to_dict()})
 
     # 添加登录API
-    @app.route("/api/doctors/login", methods=["POST"])
+    @app.route("/doctors/login", methods=["POST"])
     def doctor_login():
         """医生登录"""
         data = request.get_json(silent=True) or {}
+        print("收到医生登录请求:", data)
         phone = data.get("phone", "").strip()
         password = data.get("password", "").strip()
         
@@ -533,19 +579,397 @@ def create_app():
             return jsonify({"error": "注册失败，请重试"}), 500
 
     # =========================
+    # 提醒系统API
+    # =========================
+    
+    @app.route("/api/doctor/reminders", methods=["POST", "OPTIONS"])
+    def create_doctor_reminder():
+        """医生创建提醒"""
+        if request.method == "OPTIONS":
+            return jsonify({"ok": True})
+            
+        print("\n========== 创建医生提醒 ==========")
+        
+        # 第一步：验证请求数据
+        try:
+            data = request.get_json(silent=True)
+            if not data:
+                print("错误: 无效的JSON数据")
+                return jsonify({"error": "无效的请求数据", "detail": "请求体必须是JSON格式"}), 400
+                
+            doctor_id = data.get("doctor_id")
+            content = data.get("content", "").strip()
+            target_type = data.get("target_type")  # 'all', 'noRecord', 'abnormal'
+            
+            print(f"医生ID: {doctor_id}")
+            print(f"提醒内容: {content}")
+            print(f"目标类型: {target_type}")
+            
+            # 验证参数
+            if not doctor_id:
+                return jsonify({"error": "缺少医生ID"}), 400
+            if not content:
+                return jsonify({"error": "提醒内容不能为空"}), 400
+            if not target_type:
+                return jsonify({"error": "请选择目标患者类型"}), 400
+            if target_type not in ['all', 'noRecord', 'abnormal']:
+                return jsonify({"error": "无效的目标患者类型"}), 400
+                
+        except Exception as e:
+            print(f"错误: 处理请求数据失败 - {str(e)}")
+            return jsonify({
+                "error": "处理请求数据失败",
+                "detail": str(e) if app.debug else "请检查请求格式是否正确"
+            }), 400
+            
+        # 第二步：验证医生信息并创建提醒记录
+        try:
+            doctor = Doctor.query.get(doctor_id)
+            if not doctor:
+                print(f"错误: 找不到ID为{doctor_id}的医生")
+                return jsonify({"error": "医生不存在"}), 404
+                
+            if not doctor.village:
+                print(f"错误: 医生 {doctor.name} 未设置所属村庄")
+                return jsonify({"error": "医生未设置所属村庄"}), 400
+                
+            # 创建医生提醒记录
+            reminder = DoctorReminder(
+                doctor_id=doctor_id,
+                content=content,
+                target_type=target_type
+            )
+            db.session.add(reminder)
+            db.session.flush()  # 获取reminder.id
+            
+        except Exception as e:
+            print(f"错误: 验证医生信息失败 - {str(e)}")
+            db.session.rollback()
+            return jsonify({
+                "error": "验证医生信息失败",
+                "detail": str(e) if app.debug else "请检查医生信息是否正确"
+            }), 500
+        
+        # 第三步：查询目标患者
+        try:
+            if target_type == 'all':
+                print(f"目标：{doctor.village}的所有患者")
+                patients = Patient.query.filter_by(village=doctor.village).all()
+            elif target_type == 'noRecord':
+                print(f"目标：{doctor.village}的7天内未记录血压的患者")
+                seven_days_ago = datetime.now(timezone.utc) - timedelta(days=7)
+                subquery = db.session.query(BpRecord.user_id).filter(
+                    BpRecord.measured_at >= seven_days_ago
+                ).distinct()
+                patients = Patient.query.filter_by(village=doctor.village).filter(
+                    ~Patient.user_id.in_(subquery)
+                ).all()
+            else:  # abnormal
+                print(f"目标：{doctor.village}的血压异常患者")
+                subquery = db.session.query(
+                    BpRecord.user_id,
+                    db.func.max(BpRecord.measured_at).label('last_measure')
+                ).group_by(BpRecord.user_id).subquery()
+                
+                abnormal_records = db.session.query(BpRecord).join(
+                    subquery,
+                    db.and_(
+                        BpRecord.user_id == subquery.c.user_id,
+                        BpRecord.measured_at == subquery.c.last_measure
+                    )
+                ).filter(
+                    db.or_(
+                        BpRecord.systolic >= 140,
+                        BpRecord.systolic <= 90,
+                        BpRecord.diastolic >= 90,
+                        BpRecord.diastolic <= 60
+                    )
+                ).all()
+                
+                patient_ids = [record.user_id for record in abnormal_records]
+                patients = Patient.query.filter(
+                    Patient.user_id.in_(patient_ids),
+                    Patient.village == doctor.village
+                ).all()
+            
+            if not patients:
+                print(f"错误：未找到符合条件的患者")
+                db.session.rollback()
+                return jsonify({
+                    "error": "未找到符合条件的患者",
+                    "detail": f"在{doctor.village}未找到符合{target_type}条件的患者"
+                }), 404
+            
+            print(f"找到 {len(patients)} 名目标患者:")
+            for p in patients:
+                print(f"- {p.name} (ID: {p.user_id})")
+            
+        except Exception as e:
+            print(f"错误: 查询目标患者失败 - {str(e)}")
+            db.session.rollback()
+            return jsonify({
+                "error": "查询目标患者失败",
+                "detail": str(e) if app.debug else "查询目标患者时出错"
+            }), 500
+        
+        # 第四步：为每个患者生成提醒
+        success_count = 0
+        failed_count = 0
+        error_details = []
+        
+        for patient in patients:
+            print(f"\n为患者 {patient.name} 生成语音提醒...")
+            try:
+                # 使用临时文件名避免冲突
+                temp_filename = f"temp_{uuid.uuid4().hex}.mp3"
+                temp_path = os.path.join(static_dir, temp_filename)
+                final_filename = f"{uuid.uuid4().hex}.mp3"
+                final_path = os.path.join(static_dir, final_filename)
+                
+                try:
+                    # 生成音频文件
+                    audio_bytes = tts_iflytek(content, voice="xiaoyan", aue="lame")
+                    if not audio_bytes:
+                        raise Exception("语音生成失败：未获得音频数据")
+                        
+                    # 写入临时文件
+                    with open(temp_path, "wb") as f:
+                        f.write(audio_bytes)
+                    
+                    # 检查文件是否成功生成并包含内容
+                    if not os.path.exists(temp_path) or os.path.getsize(temp_path) == 0:
+                        raise Exception("音频文件生成失败或为空")
+                        
+                    # 如果目标文件已存在则删除
+                    if os.path.exists(final_path):
+                        os.remove(final_path)
+                        
+                    # 重命名为最终文件名
+                    os.rename(temp_path, final_path)
+                    print(f"音频文件已保存: {final_path}")
+                    
+                    # 创建患者提醒
+                    patient_reminder = PatientReminder(
+                        doctor_reminder_id=reminder.id,
+                        user_id=patient.user_id,
+                        audio_path=f"/static/{final_filename}"
+                    )
+                    db.session.add(patient_reminder)
+                    print(f"已生成提醒记录")
+                    success_count += 1
+                    
+                except Exception as e:
+                    # 清理临时文件
+                    if os.path.exists(temp_path):
+                        try:
+                            os.remove(temp_path)
+                        except:
+                            pass
+                    raise Exception(f"音频处理失败: {str(e)}")
+                    
+            except Exception as e:
+                error_msg = f"为患者 {patient.name} 创建提醒失败: {str(e)}"
+                print(f"错误: {error_msg}")
+                error_details.append(error_msg)
+                failed_count += 1
+                continue
+        
+        # 提交或回滚事务
+        try:
+            if success_count > 0:
+                db.session.commit()
+                return jsonify({
+                    "ok": True,
+                    "reminder": reminder.to_dict(),
+                    "affected_patients": success_count,
+                    "failed_count": failed_count,
+                    "error_details": error_details if app.debug else None
+                })
+            else:
+                db.session.rollback()
+                return jsonify({
+                    "error": "所有提醒创建都失败了",
+                    "detail": error_details if app.debug else "请稍后重试"
+                }), 500
+                
+        except Exception as e:
+            print(f"错误：提交事务失败 - {str(e)}")
+            db.session.rollback()
+            return jsonify({
+                "ok": False,
+                "error": "创建提醒失败",
+                "detail": str(e) if app.debug else "提交数据时出错"
+            }), 500
+
+            
+    @app.route("/api/patients/<int:user_id>/reminders", methods=["GET", "OPTIONS"])
+    def get_patient_reminders(user_id):
+        """获取患者的医生语音提醒列表，支持分页和时间范围控制"""
+        try:
+            # 处理 OPTIONS 请求
+            if request.method == "OPTIONS":
+                return jsonify({"ok": True})
+                
+            print("\n========== 获取患者提醒列表 ==========")
+            print(f"患者ID: {user_id}")
+            
+            # 首先检查患者是否存在
+            patient = Patient.query.get(user_id)
+            if not patient:
+                print(f"错误: 找不到ID为{user_id}的患者")
+                return jsonify({
+                    "ok": False,
+                    "error": f"找不到ID为{user_id}的患者"
+                }), 404
+
+            days = request.args.get('days', 7, type=int)
+            offset = request.args.get('offset', 0, type=int)
+            limit = request.args.get('limit', 20, type=int)
+            
+            cutoff_date = datetime.now(timezone.utc) - timedelta(days=days)
+            
+            print(f"查询范围: 最近{days}天 ({cutoff_date} 至今)")
+            print(f"分页参数: 偏移={offset}, 数量={limit}")
+            
+            # 构建基础查询，使用joinedload优化关联查询
+            base_query = PatientReminder.query\
+                .options(db.joinedload(PatientReminder.doctor_reminder)\
+                          .joinedload(DoctorReminder.doctor))\
+                .join(DoctorReminder)\
+                .join(Doctor, DoctorReminder.doctor_id == Doctor.worker_id)\
+                .filter(
+                    PatientReminder.patient_id == user_id,
+                    PatientReminder.created_at >= cutoff_date
+                )
+            
+            try:
+                # 首先获取总数
+                total = base_query.count()
+                print(f"\n找到 {total} 条提醒记录")
+                
+                # 获取分页数据
+                reminders = base_query\
+                    .order_by(PatientReminder.created_at.desc())\
+                    .offset(offset)\
+                    .limit(limit)\
+                    .all()
+                
+                print("\n本页提醒记录:")
+                for r in reminders:
+                    print(f"- ID: {r.id}")
+                    print(f"  医生: {r.doctor_reminder.doctor.name}")
+                    print(f"  内容: {r.doctor_reminder.content}")
+                    print(f"  时间: {r.created_at}")
+                    print(f"  状态: {'已听' if r.is_listened else '未听'}")
+                
+                # 转换提醒数据
+                reminder_list = []
+                print("\n提醒记录详情:")
+                for r in reminders:
+                    try:
+                        reminder_dict = r.to_dict()
+                        # 添加医生信息
+                        doctor = Doctor.query.get(r.doctor_reminder.doctor_id)
+                        if doctor:
+                            reminder_dict['doctor_name'] = doctor.name
+                            print(f"- ID: {r.id}")
+                            print(f"  医生: {doctor.name}")
+                            print(f"  内容: {r.doctor_reminder.content}")
+                            print(f"  创建时间: {r.created_at}")
+                            print(f"  状态: {'已听' if r.is_listened else '未听'}")
+                        reminder_list.append(reminder_dict)
+                    except Exception as e:
+                        print(f"转换提醒记录时出错: {str(e)}")
+                
+                    # 计算是否有更多数据
+                has_more = total > (offset + len(reminders))
+                print("\n分页信息:")
+                print(f"- 总记录数: {total}")
+                print(f"- 当前页数量: {len(reminders)}")
+                print(f"- 偏移量: {offset}")
+                print(f"- 是否有更多: {has_more}")
+                print("=================================")
+                
+                # 准备分页信息
+                pagination = {
+                    "total": total,
+                    "offset": offset,
+                    "limit": limit,
+                    "has_more": has_more
+                }
+            except Exception as e:
+                print(f"处理提醒数据时出错: {str(e)}")
+                raise
+            
+            # 转换提醒数据为字典格式
+            # 转换提醒数据为字典格式，优化关联查询
+            reminders_dict = []
+            for r in reminders:
+                try:
+                    reminder_dict = r.to_dict()  # 使用模型的to_dict方法
+                    reminders_dict.append(reminder_dict)
+                except Exception as e:
+                    print(f"转换提醒记录时出错: {str(e)}")
+            
+            response_data = {
+                "ok": True,
+                "reminders": reminders_dict,
+                "pagination": pagination
+            }
+            
+            return jsonify(response_data)
+            
+        except Exception as e:
+            # 记录错误详情
+            print(f"获取患者提醒失败: {str(e)}")
+            db.session.rollback()  # 回滚事务
+            return jsonify({
+                "ok": False,
+                "error": "获取提醒失败，请稍后重试",
+                "debug_info": str(e) if app.debug else None
+            }), 500
+        
+    @app.route("/api/patients/reminder/<int:reminder_id>/mark_listened", methods=["POST"])
+    def mark_reminder_listened(reminder_id):
+        """标记提醒为已听"""
+        reminder = PatientReminder.query.get(reminder_id)
+        if not reminder:
+            return jsonify({"error": "提醒不存在"}), 404
+            
+        reminder.is_listened = True
+        db.session.commit()
+        
+        return jsonify({
+            "ok": True,
+            "reminder": reminder.to_dict()
+        })
+
+    # =========================
     # 聊天消息API
     # =========================
     
-    @app.route("/api/chat/send", methods=["POST"])
+    @app.route("/chat/send", methods=["POST", "OPTIONS"])
+    @app.route("/api/chat/send", methods=["POST", "OPTIONS"])  # 兼容旧路由
     def send_chat_message():
         """发送聊天消息"""
+        # 处理 OPTIONS 请求
+        if request.method == "OPTIONS":
+            return jsonify({"ok": True})
+            
+        print("\n========== 发送聊天消息 ==========")
         data = request.get_json(silent=True) or {}
         patient_id = data.get("patient_id")
         doctor_id = data.get("doctor_id")
         sender_type = data.get("sender_type")  # 'patient' or 'doctor'
         content = data.get("content", "").strip()
         
+        print(f"发送者类型: {sender_type}")
+        print(f"患者ID: {patient_id}")
+        print(f"医生ID: {doctor_id}")
+        print(f"消息内容: {content}")
+        
         if not all([patient_id, doctor_id, sender_type, content]):
+            print("错误: 缺少必要参数")
             return jsonify({"error": "缺少必要参数"}), 400
         
         if sender_type not in ['patient', 'doctor']:
@@ -571,26 +995,57 @@ def create_app():
         
         return jsonify({"ok": True, "message": message.to_dict()})
     
-    @app.route("/api/chat/messages", methods=["GET"])
+    @app.route("/chat/messages", methods=["GET", "OPTIONS"])
+    @app.route("/api/chat/messages", methods=["GET", "OPTIONS"])  # 兼容旧路由
     def get_chat_messages():
         """获取聊天消息列表"""
+        # 处理 OPTIONS 请求
+        if request.method == "OPTIONS":
+            return jsonify({"ok": True})
+            
+        print("\n========== 获取聊天消息列表 ==========")
         patient_id = request.args.get("patient_id", type=int)
         doctor_id = request.args.get("doctor_id", type=int)
         
+        print(f"患者ID: {patient_id}")
+        print(f"医生ID: {doctor_id}")
+        
         if not patient_id or not doctor_id:
+            print("错误: 缺少必要参数")
             return jsonify({"error": "缺少必要参数"}), 400
         
         # 查询该患者和医生之间的所有消息
-        messages = ChatMessage.query.filter(
-            ChatMessage.patient_id == patient_id,
-            ChatMessage.doctor_id == doctor_id
-        ).order_by(ChatMessage.created_at.asc()).all()
-        
-        return jsonify({"ok": True, "messages": [m.to_dict() for m in messages]})
+        try:
+            messages = ChatMessage.query.filter(
+                ChatMessage.patient_id == patient_id,
+                ChatMessage.doctor_id == doctor_id
+            ).order_by(ChatMessage.created_at.asc()).all()
+            
+            print(f"找到 {len(messages)} 条消息")
+            for msg in messages:
+                print(f"- 发送者: {msg.sender_type}")
+                print(f"  时间: {msg.created_at}")
+                print(f"  内容: {msg.content}")
+                print(f"  状态: {'已读' if msg.is_read else '未读'}")
+            print("=================================")
+            
+            return jsonify({"ok": True, "messages": [m.to_dict() for m in messages]})
+        except Exception as e:
+            print(f"错误: 获取消息失败 - {str(e)}")
+            return jsonify({"error": "获取消息失败"}), 500
     
-    @app.route("/api/chat/last_message/<int:patient_id>/<int:doctor_id>", methods=["GET"])
+    @app.route("/chat/last_message/<int:patient_id>/<int:doctor_id>", methods=["GET", "OPTIONS"])
+    @app.route("/api/chat/last_message/<int:patient_id>/<int:doctor_id>", methods=["GET", "OPTIONS"])  # 兼容旧路由
     def get_last_message(patient_id, doctor_id):
         """获取最后一条消息（用于聊天列表显示）"""
+        # 处理 OPTIONS 请求
+        if request.method == "OPTIONS":
+            return jsonify({"ok": True})
+            
+        print("\n========== 获取最新消息 ==========")
+        print(f"患者ID: {patient_id}")
+        print(f"医生ID: {doctor_id}")
+        
         last_message = ChatMessage.query.filter(
             ChatMessage.patient_id == patient_id,
             ChatMessage.doctor_id == doctor_id
@@ -600,13 +1055,23 @@ def create_app():
             return jsonify({"ok": True, "message": last_message.to_dict()})
         return jsonify({"ok": True, "message": None})
     
-    @app.route("/api/chat/mark_read", methods=["POST"])
+    @app.route("/chat/mark_read", methods=["POST", "OPTIONS"])
+    @app.route("/api/chat/mark_read", methods=["POST", "OPTIONS"])  # 兼容旧路由
     def mark_messages_read():
         """标记消息为已读"""
+        # 处理 OPTIONS 请求
+        if request.method == "OPTIONS":
+            return jsonify({"ok": True})
+            
+        print("\n========== 标记消息已读 ==========")
         data = request.get_json(silent=True) or {}
         patient_id = data.get("patient_id")
         doctor_id = data.get("doctor_id")
         sender_type = data.get("sender_type")  # 'patient' or 'doctor'
+        
+        print(f"患者ID: {patient_id}")
+        print(f"医生ID: {doctor_id}")
+        print(f"发送者类型: {sender_type}")
         
         if not all([patient_id, doctor_id, sender_type]):
             return jsonify({"error": "缺少必要参数"}), 400
@@ -625,14 +1090,25 @@ def create_app():
         
         return jsonify({"ok": True, "updated_count": len(unread_messages)})
     
-    @app.route("/api/chat/unread_count", methods=["GET"])
+    @app.route("/chat/unread_count", methods=["GET", "OPTIONS"])
+    @app.route("/api/chat/unread_count", methods=["GET", "OPTIONS"])  # 兼容旧路由
     def get_unread_count():
         """获取未读消息数量"""
+        # 处理 OPTIONS 请求
+        if request.method == "OPTIONS":
+            return jsonify({"ok": True})
+            
+        print("\n========== 获取未读消息数量 ==========")
         patient_id = request.args.get("patient_id", type=int)
         doctor_id = request.args.get("doctor_id", type=int)
         sender_type = request.args.get("sender_type")
         
+        print(f"患者ID: {patient_id}")
+        print(f"医生ID: {doctor_id}")
+        print(f"发送者类型: {sender_type}")
+        
         if not all([patient_id, doctor_id, sender_type]):
+            print("错误: 缺少必要参数")
             return jsonify({"error": "缺少必要参数"}), 400
         
         count = ChatMessage.query.filter(
@@ -644,29 +1120,93 @@ def create_app():
         
         return jsonify({"ok": True, "unread_count": count})
     
-    @app.route("/api/patients/<int:user_id>/doctors", methods=["GET"])
+    @app.route("/patients/<int:user_id>/doctors", methods=["GET"])
     def get_patient_doctors(user_id):
         """获取患者所在村庄的医生列表"""
-        patient = Patient.query.get(user_id)
-        if not patient:
-            return jsonify({"error": "患者不存在"}), 404
-        
-        village = patient.village
-        doctors = Doctor.query.filter_by(village=village).all()
-        
-        return jsonify({"ok": True, "doctors": [d.to_dict() for d in doctors]})
+        try:
+            # 获取患者信息
+            patient = Patient.query.get(user_id)
+            if not patient:
+                return jsonify({
+                    "ok": False,
+                    "error": "找不到患者信息"
+                }), 404
+
+            if not patient.village:
+                return jsonify({
+                    "ok": False,
+                    "error": "患者未设置所属村庄"
+                }), 400
+
+            # 查询同村医生
+            doctors = Doctor.query.filter_by(village=patient.village).all()
+            
+            print("\n========== 获取医生列表 ==========")
+            print(f"患者: {patient.name} (ID: {patient.user_id})")
+            print(f"村庄: {patient.village}")
+            print(f"找到医生数量: {len(doctors)}")
+            for doc in doctors:
+                print(f"- {doc.name} (ID: {doc.worker_id}, 角色: {doc.role})")
+            print("=================================")
+            
+            return jsonify({
+                "ok": True,
+                "doctors": [d.to_dict() for d in doctors],
+                "village": patient.village
+            })
+            
+        except Exception as e:
+            print(f"获取医生列表时出错: {str(e)}")
+            return jsonify({
+                "ok": False,
+                "error": "获取医生列表失败",
+                "debug_info": str(e)
+            }), 500
     
-    @app.route("/api/doctors/<int:doctor_id>/patients", methods=["GET"])
+    @app.route("/doctors/<int:doctor_id>/patients", methods=["GET"])
     def get_doctor_patients(doctor_id):
         """获取医生所在村庄的患者列表"""
-        doctor = Doctor.query.get(doctor_id)
-        if not doctor:
-            return jsonify({"error": "医生不存在"}), 404
-        
-        village = doctor.village
-        patients = Patient.query.filter_by(village=village).all()
-        
-        return jsonify({"ok": True, "patients": [p.to_dict() for p in patients]})
+        try:
+            # 获取医生信息
+            doctor = Doctor.query.get(doctor_id)
+            if not doctor:
+                return jsonify({
+                    "ok": False,
+                    "error": "找不到医生信息"
+                }), 404
+
+            if not doctor.village:
+                return jsonify({
+                    "ok": False,
+                    "error": "医生未设置所属村庄"
+                }), 400
+
+            # 查询同村患者
+            patients = Patient.query.filter_by(village=doctor.village)\
+                .order_by(Patient.name.asc())\
+                .all()
+            
+            print("\n========== 获取患者列表 ==========")
+            print(f"医生: {doctor.name} (ID: {doctor.worker_id})")
+            print(f"村庄: {doctor.village}")
+            print(f"找到患者数量: {len(patients)}")
+            for pat in patients:
+                print(f"- {pat.name} (ID: {pat.user_id}, 性别: {pat.gender.value})")
+            print("=================================")
+            
+            return jsonify({
+                "ok": True,
+                "patients": [p.to_dict() for p in patients],
+                "village": doctor.village
+            })
+            
+        except Exception as e:
+            print(f"获取患者列表时出错: {str(e)}")
+            return jsonify({
+                "ok": False,
+                "error": "获取患者列表失败",
+                "debug_info": str(e)
+            }), 500
     
     # =========================
     # 前端静态托管（生产用）
@@ -686,12 +1226,46 @@ def create_app():
 
 
 
+# 检查村庄数据
+def check_village_data():
+    print("\n检查数据完整性...")
+    
+    # 检查医生数据
+    doctors = Doctor.query.all()
+    doctors_without_village = [d for d in doctors if not d.village]
+    if doctors_without_village:
+        print(f"警告：发现 {len(doctors_without_village)} 名医生未设置所属村庄：")
+        for d in doctors_without_village:
+            print(f"- 医生ID: {d.worker_id}, 姓名: {d.name}")
+    else:
+        print(f"医生数据正常，共 {len(doctors)} 名医生")
+    
+    # 检查患者数据
+    patients = Patient.query.all()
+    patients_without_village = [p for p in patients if not p.village]
+    if patients_without_village:
+        print(f"警告：发现 {len(patients_without_village)} 名患者未设置所属村庄：")
+        for p in patients_without_village:
+            print(f"- 患者ID: {p.user_id}, 姓名: {p.name}")
+    else:
+        print(f"患者数据正常，共 {len(patients)} 名患者")
+    
+    # 统计每个村庄的医生和患者数量
+    villages = set([d.village for d in doctors if d.village] + [p.village for p in patients if p.village])
+    print("\n各村庄统计：")
+    for village in sorted(villages):
+        doctor_count = len([d for d in doctors if d.village == village])
+        patient_count = len([p for p in patients if p.village == village])
+        print(f"- {village}：{doctor_count} 名医生，{patient_count} 名患者")
+
 # 直接运行后端
 
 if __name__ == "__main__":
     app = create_app()
     with app.app_context():
         db.create_all()
+        # 检查数据完整性
+        check_village_data()
         # 初始化演示数据
         if Patient.query.count() == 0:
             demo_patient = Patient(

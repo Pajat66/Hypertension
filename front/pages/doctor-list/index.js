@@ -14,8 +14,11 @@ Page({
     // 如果直接获取不到，从 userInfo 中获取
     if (!patientId) {
       const userInfo = wx.getStorageSync('userInfo')
+      console.log('获取到的患者信息:', userInfo);
       if (userInfo && userInfo.user_id) {
-        patientId = userInfo.user_id
+        patientId = userInfo.user_id;
+        // 保存患者ID以便后续使用
+        wx.setStorageSync('userId', patientId);
       }
     }
     
@@ -38,9 +41,13 @@ Page({
 
     this.setData({ loading: true })
     const apiBase = app.globalData.API_BASE
+    console.log('正在获取医生列表，患者ID:', patientId);
 
     wx.request({
       url: `${apiBase}/patients/${patientId}/doctors`,
+      header: {
+        'Content-Type': 'application/json'
+      },
       method: 'GET',
       success: (res) => {
         this.setData({ loading: false })

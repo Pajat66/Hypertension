@@ -25,7 +25,7 @@ Page({
     wx.showToast({ title: '登录中...', icon: 'loading', duration: 2000 });
     
     try {
-      const result = await request('/patients/login', {
+      const result = await request('/api/patients/login', {
         method: 'POST',
         data: { phone, password }
       });
