@@ -3,6 +3,7 @@
 import os
 import re
 import uuid
+import traceback
 from typing import Optional, Tuple
 from datetime import datetime, timezone, timedelta
 
@@ -717,20 +718,26 @@ def create_app():
         failed_count = 0
         error_details = []
         
+        # 确保static_dir在作用域内
+        reminder_static_dir = static_dir
+        
         for patient in patients:
             print(f"\n为患者 {patient.name} 生成语音提醒...")
             try:
                 # 使用临时文件名避免冲突
                 temp_filename = f"temp_{uuid.uuid4().hex}.mp3"
-                temp_path = os.path.join(static_dir, temp_filename)
+                temp_path = os.path.join(reminder_static_dir, temp_filename)
                 final_filename = f"{uuid.uuid4().hex}.mp3"
-                final_path = os.path.join(static_dir, final_filename)
+                final_path = os.path.join(reminder_static_dir, final_filename)
                 
                 try:
                     # 生成音频文件
+                    print(f"正在调用TTS生成语音...")
                     audio_bytes = tts_iflytek(content, voice="xiaoyan", aue="lame")
                     if not audio_bytes:
                         raise Exception("语音生成失败：未获得音频数据")
+                    
+                    print(f"TTS生成成功，音频大小: {len(audio_bytes)} 字节")
                         
                     # 写入临时文件
                     with open(temp_path, "wb") as f:
@@ -739,6 +746,8 @@ def create_app():
                     # 检查文件是否成功生成并包含内容
                     if not os.path.exists(temp_path) or os.path.getsize(temp_path) == 0:
                         raise Exception("音频文件生成失败或为空")
+                    
+                    print(f"临时文件已写入: {temp_path}, 大小: {os.path.getsize(temp_path)} 字节")
                         
                     # 如果目标文件已存在则删除
                     if os.path.exists(final_path):
@@ -760,16 +769,19 @@ def create_app():
                     
                 except Exception as e:
                     # 清理临时文件
-                    if os.path.exists(temp_path):
+                    if 'temp_path' in locals() and os.path.exists(temp_path):
                         try:
                             os.remove(temp_path)
                         except:
                             pass
-                    raise Exception(f"音频处理失败: {str(e)}")
+                    error_msg = f"音频处理失败: {str(e)}"
+                    print(f"错误: {error_msg}")
+                    raise Exception(error_msg)
                     
             except Exception as e:
                 error_msg = f"为患者 {patient.name} 创建提醒失败: {str(e)}"
                 print(f"错误: {error_msg}")
+                print(f"详细错误堆栈:\n{traceback.format_exc()}")
                 error_details.append(error_msg)
                 failed_count += 1
                 continue
@@ -778,6 +790,7 @@ def create_app():
         try:
             if success_count > 0:
                 db.session.commit()
+                print(f"成功为 {success_count} 名患者创建提醒，失败 {failed_count} 个")
                 return jsonify({
                     "ok": True,
                     "reminder": reminder.to_dict(),
@@ -787,13 +800,20 @@ def create_app():
                 })
             else:
                 db.session.rollback()
+                print(f"所有提醒创建都失败了，共 {failed_count} 个失败")
+                error_msg = "所有提醒创建都失败了"
+                if error_details:
+                    error_msg += f": {error_details[0] if len(error_details) == 1 else f'共{len(error_details)}个错误'}"
                 return jsonify({
-                    "error": "所有提醒创建都失败了",
-                    "detail": error_details if app.debug else "请稍后重试"
+                    "ok": False,
+                    "error": error_msg,
+                    "detail": error_details[0] if error_details else "请稍后重试",
+                    "all_errors": error_details if app.debug else None
                 }), 500
                 
         except Exception as e:
             print(f"错误：提交事务失败 - {str(e)}")
+            print(f"详细错误堆栈:\n{traceback.format_exc()}")
             db.session.rollback()
             return jsonify({
                 "ok": False,
@@ -838,7 +858,7 @@ def create_app():
                 .join(DoctorReminder)\
                 .join(Doctor, DoctorReminder.doctor_id == Doctor.worker_id)\
                 .filter(
-                    PatientReminder.patient_id == user_id,
+                    PatientReminder.user_id == user_id,
                     PatientReminder.created_at >= cutoff_date
                 )
             
@@ -1209,11 +1229,47 @@ def create_app():
             }), 500
     
     # =========================
+    # 静态文件服务（音频等）
+    # =========================
+    @app.route("/static/<path:filename>")
+    def serve_static(filename):
+        """提供静态文件服务（音频文件等）"""
+        try:
+            file_path = os.path.join(static_dir, filename)
+            print(f"\n========== 请求静态文件 ==========")
+            print(f"文件名: {filename}")
+            print(f"完整路径: {file_path}")
+            print(f"文件存在: {os.path.exists(file_path)}")
+            print(f"是文件: {os.path.isfile(file_path) if os.path.exists(file_path) else 'N/A'}")
+            
+            if os.path.exists(file_path) and os.path.isfile(file_path):
+                print(f"文件大小: {os.path.getsize(file_path)} 字节")
+                response = send_from_directory(static_dir, filename)
+                # 确保音频文件有正确的 MIME 类型
+                if filename.lower().endswith('.mp3'):
+                    response.headers['Content-Type'] = 'audio/mpeg'
+                elif filename.lower().endswith('.wav'):
+                    response.headers['Content-Type'] = 'audio/wav'
+                print(f"返回文件成功")
+                return response
+            else:
+                print(f"错误: 静态文件不存在或不是文件")
+                return jsonify({"error": "文件不存在"}), 404
+        except Exception as e:
+            print(f"错误: 提供静态文件时出错 - {str(e)}")
+            print(f"详细错误堆栈:\n{traceback.format_exc()}")
+            return jsonify({"error": "服务器错误"}), 500
+    
+    # =========================
     # 前端静态托管（生产用）
     # =========================
     @app.route("/", defaults={"path": ""})
     @app.route("/<path:path>")
     def spa(path):
+        # 跳过 /static/ 路径，由上面的路由处理
+        if path.startswith("static/"):
+            return jsonify({"error": "静态文件路由未匹配"}), 404
+        
         file_path = os.path.join(static_dir, path)
         if path and os.path.exists(file_path):
             return send_from_directory(static_dir, path)

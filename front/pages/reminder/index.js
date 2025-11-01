@@ -255,10 +255,25 @@ Page({
 
       if (res.statusCode === 200 && res.data.ok) {
         wx.hideLoading();
+        const successMsg = res.data.affected_patients 
+          ? `发送成功，已发送给${res.data.affected_patients}名患者` 
+          : '发送成功';
         wx.showToast({
-          title: '发送成功',
-          icon: 'success'
+          title: successMsg,
+          icon: 'success',
+          duration: 2000
         });
+
+        // 如果有部分失败，显示警告
+        if (res.data.failed_count > 0) {
+          setTimeout(() => {
+            wx.showToast({
+              title: `${res.data.failed_count}个患者发送失败`,
+              icon: 'none',
+              duration: 3000
+            });
+          }, 2200);
+        }
 
         // 重置选择状态
         this.setData({
@@ -271,14 +286,23 @@ Page({
           }))
         });
       } else {
-        throw new Error(res.data.error || '发送失败');
+        const errorMsg = res.data.error || res.data.detail || '发送失败';
+        console.error('发送提醒失败:', {
+          statusCode: res.statusCode,
+          error: res.data.error,
+          detail: res.data.detail,
+          allErrors: res.data.all_errors
+        });
+        throw new Error(errorMsg);
       }
     } catch (error) {
       console.error('发送提醒失败:', error);
       wx.hideLoading();
+      const errorMessage = error.message || '发送失败，请稍后重试';
       wx.showToast({
-        title: '发送失败',
-        icon: 'error'
+        title: errorMessage.length > 20 ? errorMessage.substring(0, 20) + '...' : errorMessage,
+        icon: 'error',
+        duration: 3000
       });
     }
   }

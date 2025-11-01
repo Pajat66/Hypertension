@@ -7,14 +7,17 @@ Page({
   data: {
     time: '',
     network: '',
-    reminders: [],
+    reminders: [],  // 原始提醒列表
+    groupedReminders: [],  // 按日期分组的提醒列表
     currentAudio: null,
     userInfo: null,
     loading: false,
     offset: 0,
     hasMore: true,
     playingId: null,
-    error: null
+    error: null,
+    currentPage: 0,  // 当前显示的页数（日期分组）
+    pageSize: 10  // 每页显示的提醒条数
   },
 
   onLoad: function() {
@@ -138,8 +141,12 @@ Page({
       var reminders = result.reminders || [];
       var newReminders = refresh ? reminders : that.data.reminders.concat(reminders);
       
+      // 按日期分组
+      var grouped = that.groupRemindersByDate(newReminders);
+      
       that.setData({
         reminders: newReminders,
+        groupedReminders: grouped,
         offset: offset + reminders.length,
         hasMore: pagination.has_more !== undefined ? pagination.has_more : false,
         error: null
@@ -147,6 +154,7 @@ Page({
       
       console.log('更新后的数据:', {
         remindersCount: newReminders.length,
+        groupedCount: grouped.length,
         offset: offset + reminders.length,
         hasMore: pagination.has_more
       });
@@ -271,7 +279,14 @@ Page({
         }
         return item;
       });
-      that.setData({ reminders: reminders });
+      
+      // 重新分组
+      var grouped = that.groupRemindersByDate(reminders);
+      
+      that.setData({ 
+        reminders: reminders,
+        groupedReminders: grouped
+      });
     }).catch(function(error) {
       console.error('更新提醒状态失败:', error);
     });
@@ -306,9 +321,70 @@ Page({
       offset: 0,
       hasMore: true,
       error: null,
-      reminders: []
+      reminders: [],
+      groupedReminders: [],
+      currentPage: 0
     }, function() {
       that.fetchReminders(true);
     });
+  },
+
+  // 按日期分组提醒
+  groupRemindersByDate: function(reminders) {
+    var grouped = {};
+    var that = this;
+    
+    reminders.forEach(function(reminder) {
+      var dateStr = that.getDateString(reminder.created_at);
+      if (!grouped[dateStr]) {
+        grouped[dateStr] = {
+          date: dateStr,
+          displayDate: that.formatDisplayDate(reminder.created_at),
+          reminders: []
+        };
+      }
+      grouped[dateStr].reminders.push(reminder);
+    });
+    
+    // 转换为数组并按日期倒序排列
+    var result = Object.values(grouped).sort(function(a, b) {
+      return new Date(b.date) - new Date(a.date);
+    });
+    
+    return result;
+  },
+
+  // 获取日期字符串（YYYY-MM-DD）
+  getDateString: function(dateStr) {
+    if (!dateStr) return '';
+    // 处理格式 "2025-10-31 10:06:07"
+    var parts = dateStr.split(' ');
+    return parts[0] || '';
+  },
+
+  // 格式化显示日期
+  formatDisplayDate: function(dateStr) {
+    if (!dateStr) return '';
+    var date = new Date(dateStr.replace(/-/g, '/'));
+    var today = new Date();
+    var yesterday = new Date(today);
+    yesterday.setDate(yesterday.getDate() - 1);
+    
+    // 重置时间部分，只比较日期
+    today.setHours(0, 0, 0, 0);
+    yesterday.setHours(0, 0, 0, 0);
+    date.setHours(0, 0, 0, 0);
+    
+    if (date.getTime() === today.getTime()) {
+      return '今天';
+    } else if (date.getTime() === yesterday.getTime()) {
+      return '昨天';
+    } else {
+      var month = date.getMonth() + 1;
+      var day = date.getDate();
+      var weekdays = ['日', '一', '二', '三', '四', '五', '六'];
+      var weekday = weekdays[date.getDay()];
+      return month + '月' + day + '日 星期' + weekday;
+    }
   }
 });
