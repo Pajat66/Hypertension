@@ -25,9 +25,17 @@ Page({
     wx.showToast({ title: '登录中...', icon: 'loading', duration: 2000 });
     
     try {
+      console.log('正在发送登录请求...');
       const result = await request('/doctors/login', {
         method: 'POST',
-        data: { phone, password }
+        header: {
+          'Content-Type': 'application/json'
+        },
+        data: { 
+          phone, 
+          password,
+          name 
+        }
       });
 
       if (result.ok) {

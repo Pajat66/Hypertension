@@ -1,6 +1,6 @@
 
 from flask_sqlalchemy import SQLAlchemy
-from datetime import datetime, timezone, date, time
+from datetime import datetime, timezone, date, time, timedelta
 from enum import Enum
 
 db = SQLAlchemy()
@@ -227,6 +227,114 @@ class Reminder(db.Model):
             "created_at": self.created_at.isoformat() if self.created_at else None,
             "updated_at": self.updated_at.isoformat() if self.updated_at else None
         }
+
+class DoctorReminder(db.Model):
+    """医生提醒表"""
+    __tablename__ = 'doctor_reminders'
+
+    id = db.Column(db.Integer, primary_key=True, autoincrement=True)
+    doctor_id = db.Column(db.Integer, db.ForeignKey('doctors.worker_id', ondelete='CASCADE'), nullable=False, index=True)
+    content = db.Column(db.Text, nullable=False)
+    target_type = db.Column(db.String(20), nullable=False)  # 'all', 'noRecord', 'abnormal'
+    created_at = db.Column(db.DateTime, default=datetime.now(timezone.utc), index=True)
+    
+    # 关系
+    doctor = db.relationship("Doctor", backref="reminders_sent", lazy=True)
+    patient_reminders = db.relationship("PatientReminder", backref="doctor_reminder", lazy=True, cascade="all, delete-orphan")
+
+    def to_dict(self):
+        return {
+            "id": self.id,
+            "doctor_id": self.doctor_id,
+            "content": self.content,
+            "target_type": self.target_type,
+            "created_at": self.created_at.isoformat() if self.created_at else None,
+            "doctor_name": self.doctor.name if self.doctor else None
+        }
+
+class PatientReminder(db.Model):
+    """患者提醒表"""
+    __tablename__ = 'patient_reminders'
+
+    id = db.Column(db.Integer, primary_key=True, autoincrement=True)
+    doctor_reminder_id = db.Column(db.Integer, db.ForeignKey('doctor_reminders.id', ondelete='CASCADE'), nullable=False, index=True)
+    # 使用 name 参数支持数据库中可能存在的 patient_id 列名，同时保持代码中使用 user_id
+    user_id = db.Column(db.Integer, db.ForeignKey('patients.user_id', ondelete='CASCADE'), name='patient_id', nullable=False, index=True)
+    is_listened = db.Column(db.Boolean, default=False, index=True)
+    audio_path = db.Column(db.String(255))
+    created_at = db.Column(db.DateTime, default=datetime.now(timezone.utc), index=True)
+    
+    # 关系，使用延迟加载和连接加载优化
+    patient = db.relationship("Patient", 
+                            backref=db.backref("reminders_received", 
+                                             lazy="dynamic",
+                                             order_by="desc(PatientReminder.created_at)"), 
+                            lazy="joined")
+
+    def to_dict(self):
+        """转换为字典格式，包含更多上下文信息"""
+        # 安全地处理时区转换
+        created_at = None
+        if self.created_at:
+            try:
+                # 如果 created_at 没有时区信息，先添加 UTC 时区
+                created_at_aware = self.created_at
+                if created_at_aware.tzinfo is None:
+                    created_at_aware = created_at_aware.replace(tzinfo=timezone.utc)
+                # 转换为东八区时间
+                created_at = created_at_aware.astimezone(timezone(timedelta(hours=8)))
+            except Exception as e:
+                print(f"转换 created_at 时出错: {str(e)}")
+                # 如果转换失败，使用原始值
+                created_at = self.created_at
+        
+        doctor_reminder = self.doctor_reminder if self.doctor_reminder else None
+        doctor = doctor_reminder.doctor if doctor_reminder else None
+
+        return {
+            "id": self.id,
+            "doctor_reminder_id": self.doctor_reminder_id,
+            "user_id": self.user_id,  # 统一使用user_id
+            "is_listened": self.is_listened,
+            "audio_path": self.audio_path,
+            "content": doctor_reminder.content if doctor_reminder else None,
+            "created_at": created_at.strftime('%Y-%m-%d %H:%M:%S') if created_at and hasattr(created_at, 'strftime') else (str(created_at) if created_at else None),
+            "doctor_id": doctor.worker_id if doctor else None,
+            "doctor_name": doctor.name if doctor else None,
+            "relative_time": self._get_relative_time(),
+            # 添加更多上下文信息
+            "patient_name": self.patient.name if self.patient else None,
+            "village": self.patient.village if self.patient else None,
+            "doctor_role": doctor.role if doctor else None
+        }
+        
+    def _get_relative_time(self):
+        """获取相对时间显示"""
+        if not self.created_at:
+            return ''
+        
+        # 确保 created_at 是带时区的，如果不是则添加 UTC 时区
+        created_at_aware = self.created_at
+        if created_at_aware.tzinfo is None:
+            created_at_aware = created_at_aware.replace(tzinfo=timezone.utc)
+        
+        now = datetime.now(timezone.utc)
+        diff = now - created_at_aware
+        
+        if diff.days > 7:
+            # 转换为东八区时间
+            created_at_cst = created_at_aware.astimezone(timezone(timedelta(hours=8)))
+            return created_at_cst.strftime('%Y-%m-%d')
+        elif diff.days > 0:
+            return f'{diff.days}天前'
+        elif diff.seconds >= 3600:
+            hours = diff.seconds // 3600
+            return f'{hours}小时前'
+        elif diff.seconds >= 60:
+            minutes = diff.seconds // 60
+            return f'{minutes}分钟前'
+        else:
+            return '刚刚'
 
 class ChatMessage(db.Model):
     """聊天消息表"""

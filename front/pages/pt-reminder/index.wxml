@@ -7,17 +7,53 @@
     <text class="nav-title">听提醒</text>
   </view>
 
- 
-
   <!-- 主内容区域 -->
   <view class="main-content">
-    <view style="margin-bottom: 40px;">
-     <image src="/images/icon/喇叭.png" class="icon-with-border-mic" style="width:120px;height:120px;" />
+    <view class="time-display">
+      <text class="time">{{time}}</text>
+      <text class="network">{{network}}</text>
     </view>
-    <view class="reminder-card" bindtap="playReminder">
-      <text class="reminder-label">村医提醒：</text>
-      <text class="reminder-content">{{reminderContent}}</text>
-      <text class="reminder-status" wx:if="{{hasListened}}">已听</text>
-    </view>
+    
+    <scroll-view scroll-y class="reminder-list" enable-flex>
+      <block wx:if="{{groupedReminders.length > 0}}">
+        <block wx:for="{{groupedReminders}}" wx:for-item="group" wx:key="date">
+          <!-- 日期标题 -->
+          <view class="date-header">
+            <text class="date-title">{{group.displayDate}}</text>
+            <text class="date-count">({{group.reminders.length}}条)</text>
+          </view>
+          
+          <!-- 该日期下的提醒列表 -->
+          <block wx:for="{{group.reminders}}" wx:for-item="item" wx:key="id">
+            <view class="reminder-card {{item.is_listened ? 'listened' : ''}}">
+              <view class="reminder-header">
+                <text class="doctor-name">{{item.doctor_name}}医生提醒：</text>
+                <text class="reminder-time">{{item.relative_time}}</text>
+              </view>
+              <view class="reminder-body">
+                <text class="reminder-content">{{item.content}}</text>
+                <view class="play-btn {{playingId === item.id ? 'playing' : ''}}" bindtap="playReminder" data-reminder="{{item}}">
+                  <image src="/images/icon/喇叭.png" class="speaker-icon" />
+                </view>
+              </view>
+              <text class="reminder-status" wx:if="{{item.is_listened}}">已听</text>
+            </view>
+          </block>
+        </block>
+        
+        <view class="loading-more" wx:if="{{loading}}">
+          <view class="loading-dot"></view>
+          <text>加载中...</text>
+        </view>
+        <view class="no-more" wx:if="{{!hasMore && !loading}}">
+          <text>没有更多提醒了</text>
+        </view>
+      </block>
+      <block wx:else>
+        <view class="no-reminder" wx:if="{{!loading}}">
+          <text>暂无提醒消息</text>
+        </view>
+      </block>
+    </scroll-view>
   </view>
 </view>

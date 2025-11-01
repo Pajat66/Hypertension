@@ -7,10 +7,7 @@ App({
     try {
       const { miniProgram } = wx.getAccountInfoSync()
       const env = miniProgram.envVersion // 'develop' | 'trial' | 'release'
-      this.globalData.API_BASE =
-        env === 'release'
-          ? 'https://api.your-domain.com/api'     // 发布版/真机
-          : 'http://192.168.150.117:5000/api'       // 用的我的后端ip开发版/工具
+      this.globalData.API_BASE = 'http://192.168.150.117:5000'  // 统一使用开发环境地址
       
       console.log('环境版本:', env)
       console.log('API_BASE设置为:', this.globalData.API_BASE)
