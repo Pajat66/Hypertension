@@ -11,7 +11,7 @@ from flask import Flask, jsonify, send_from_directory, request
 from flask_cors import CORS
 from models import (
     db, Patient, Doctor, BpRecord, Medicine, DocMsg, Reminder, ChatMessage, 
-    DoctorReminder, PatientReminder,
+    DoctorReminder, PatientReminder, BpAnalysis,
     GenderEnum, MethodEnum, PlanTypeEnum, ChannelEnum
 )
 
@@ -25,7 +25,7 @@ class Config:
     SQLALCHEMY_DATABASE_URI = os.environ.get(
         "DATABASE_URL",
         # 更换网络时记得改 IP
-        "mysql+pymysql://project:Zbp42682600@192.168.150.117:3306/hypertension_db?charset=utf8mb4"
+        "mysql+pymysql://project:Zbp42682600@192.168.164.117:3306/hypertension_db?charset=utf8mb4"
     )
     SQLALCHEMY_TRACK_MODIFICATIONS = False
 
@@ -295,6 +295,88 @@ def create_app():
         """获取患者的血压记录"""
         records = BpRecord.query.filter_by(user_id=user_id).order_by(BpRecord.measured_at.desc()).all()
         return jsonify([r.to_dict() for r in records])
+
+    # 血压趋势分析API
+    @app.route("/api/patients/<int:user_id>/bp_analysis", methods=["GET"])
+    def get_bp_analysis(user_id):
+        """获取患者的最新血压趋势分析"""
+        try:
+            # 获取最新的分析记录
+            analysis = BpAnalysis.query.filter_by(user_id=user_id)\
+                .order_by(BpAnalysis.created_at.desc())\
+                .first()
+            
+            if analysis:
+                return jsonify({
+                    "ok": True,
+                    "analysis": analysis.to_dict()
+                })
+            else:
+                return jsonify({
+                    "ok": True,
+                    "analysis": None
+                })
+        except Exception as e:
+            print(f"获取血压趋势分析失败: {str(e)}")
+            return jsonify({
+                "ok": False,
+                "error": "获取血压趋势分析失败",
+                "debug_info": str(e)
+            }), 500
+
+    @app.route("/api/patients/<int:user_id>/bp_analysis", methods=["POST"])
+    def create_bp_analysis(user_id):
+        """创建或更新患者的血压趋势分析"""
+        try:
+            data = request.get_json(silent=True) or {}
+            analysis_text = data.get("analysis_text", "").strip()
+            worker_id = data.get("worker_id")  # 医生ID
+            
+            if not analysis_text:
+                return jsonify({
+                    "ok": False,
+                    "error": "分析文本不能为空"
+                }), 400
+
+            # 验证患者是否存在
+            patient = Patient.query.get(user_id)
+            if not patient:
+                return jsonify({
+                    "ok": False,
+                    "error": "患者不存在"
+                }), 404
+
+            # 验证医生是否存在（如果提供了医生ID）
+            if worker_id:
+                doctor = Doctor.query.get(worker_id)
+                if not doctor:
+                    return jsonify({
+                        "ok": False,
+                        "error": "医生不存在"
+                    }), 404
+
+            # 创建新的分析记录（每次保存都创建新记录，保留历史）
+            analysis = BpAnalysis(
+                user_id=user_id,
+                worker_id=worker_id,
+                analysis_text=analysis_text
+            )
+            
+            db.session.add(analysis)
+            db.session.commit()
+
+            return jsonify({
+                "ok": True,
+                "analysis": analysis.to_dict()
+            })
+        except Exception as e:
+            db.session.rollback()
+            print(f"创建血压趋势分析失败: {str(e)}")
+            return jsonify({
+                "ok": False,
+                "error": "创建血压趋势分析失败",
+                "debug_info": str(e)
+            }), 500
 
     # 添加用药记录API
     @app.route("/api/patients/<int:user_id>/medicines")

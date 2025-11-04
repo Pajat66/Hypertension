@@ -42,13 +42,11 @@ Page({
     });
   },
 
-  // 新增：跳转到“血压历史”页面（文件名 blood）
+  // 新增：跳转到"血压历史"页面（患者端页面 pt-blood）
   gotoBlood() {
-    // 传递患者姓名（示例：张三，可从登录信息中获取）
-    const patientName = encodeURIComponent('张三');
+    // 患者端血压历史页面会从本地存储获取患者信息，不需要传递参数
     wx.navigateTo({
-      // 路径对应“血压历史”页面的文件路径（blood）
-      url: `/pages/blood/index?patientName=${patientName}`
+      url: '/pages/pt-blood/index'
     });
   },
 

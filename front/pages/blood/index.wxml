@@ -4,13 +4,24 @@
     <view class="title">血压历史</view>
   </view>
 
-  <view class="patient-name">张三</view>
+  <view class="patient-name">{{patientName || '患者'}}</view>
 
   <canvas canvas-id="bpChart" class="chart-canvas"></canvas>
 
-  <!-- 听方言解读按钮：拆分文字和喇叭图标，分别绑定事件 -->
-  <view class="dialect-btn">
-    <text class="btn-text" bindtap="playDialect">听方言解读</text>
-    <image class="speaker-icon" src="../../images/icon/喇叭.png" mode="widthFix" bindtap="playVoice" />
+  <!-- 趋势分析输入框 -->
+  <view class="analysis-section">
+    <view class="analysis-title">血压趋势分析</view>
+    <textarea 
+      class="analysis-input" 
+      placeholder="请输入对患者血压趋势的分析和建议..."
+      value="{{analysisText}}"
+      bindinput="onAnalysisInput"
+      maxlength="500"
+      show-confirm-bar="{{false}}"
+    ></textarea>
+    <view class="analysis-footer">
+      <text class="char-count">{{analysisText.length}}/500</text>
+      <button class="save-btn" bindtap="saveAnalysis">保存分析</button>
+    </view>
   </view>
 </view>

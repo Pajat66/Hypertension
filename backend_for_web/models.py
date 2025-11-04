@@ -364,3 +364,30 @@ class ChatMessage(db.Model):
             "patient_name": self.patient.name if self.patient else None,
             "doctor_name": self.doctor.name if self.doctor else None
         }
+
+class BpAnalysis(db.Model):
+    """血压趋势分析表"""
+    __tablename__ = 'bp_analysis'
+    
+    analysis_id = db.Column(db.Integer, primary_key=True, autoincrement=True)
+    user_id = db.Column(db.Integer, db.ForeignKey('patients.user_id', ondelete='CASCADE'), nullable=False, index=True)
+    worker_id = db.Column(db.Integer, db.ForeignKey('doctors.worker_id', ondelete='SET NULL'), index=True)
+    analysis_text = db.Column(db.Text, nullable=False)  # 趋势分析文本
+    created_at = db.Column(db.DateTime, default=datetime.now(timezone.utc), index=True)
+    updated_at = db.Column(db.DateTime, default=datetime.now(timezone.utc), onupdate=datetime.now(timezone.utc))
+    
+    # 关系
+    patient = db.relationship("Patient", backref="bp_analyses", lazy=True)
+    doctor = db.relationship("Doctor", backref="bp_analyses", lazy=True)
+
+    def to_dict(self):
+        return {
+            "analysis_id": self.analysis_id,
+            "user_id": self.user_id,
+            "worker_id": self.worker_id,
+            "analysis_text": self.analysis_text,
+            "created_at": self.created_at.isoformat() if self.created_at else None,
+            "updated_at": self.updated_at.isoformat() if self.updated_at else None,
+            "patient_name": self.patient.name if self.patient else None,
+            "doctor_name": self.doctor.name if self.doctor else None
+        }

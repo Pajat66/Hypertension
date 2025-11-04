@@ -219,3 +219,21 @@
   width: 40rpx;
   height: 40rpx;
 }
+
+.loading-text {
+  font-size: 32rpx;
+  color: #999;
+  text-align: center;
+  padding: 40rpx 0;
+}
+
+.empty-state {
+  font-size: 32rpx;
+  color: #999;
+  text-align: center;
+  padding: 80rpx 0;
+}
+
+.no-bp {
+  color: #999;
+}

@@ -47,25 +47,54 @@
   margin-bottom: 60rpx;
 }
 
-.dialect-btn {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  width: 400rpx;
-  height: 120rpx;
-  background-color: #cdf7be;
+.analysis-section {
+  width: 100%;
+  background-color: #fff;
   border-radius: 20rpx;
-  box-shadow: 0 4rpx 10rpx rgba(0,0,0,0.1);
-  gap: 15rpx; /* 文字与图标间距 */
+  padding: 30rpx;
+  box-sizing: border-box;
+  margin-bottom: 40rpx;
 }
 
-.btn-text {
+.analysis-title {
   font-size: 36rpx;
   font-weight: bold;
   color: #333;
+  margin-bottom: 20rpx;
 }
 
-.speaker-icon {
-  width: 45rpx;
-  height: 45rpx;
+.analysis-input {
+  width: 100%;
+  min-height: 200rpx;
+  background-color: #f5f5f5;
+  border-radius: 10rpx;
+  padding: 20rpx;
+  font-size: 28rpx;
+  color: #333;
+  box-sizing: border-box;
+  margin-bottom: 20rpx;
+}
+
+.analysis-footer {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.char-count {
+  font-size: 24rpx;
+  color: #999;
+}
+
+.save-btn {
+  background-color: #4285f4;
+  color: #fff;
+  font-size: 28rpx;
+  padding: 15rpx 40rpx;
+  border-radius: 10rpx;
+  border: none;
+}
+
+.save-btn::after {
+  border: none;
 }
