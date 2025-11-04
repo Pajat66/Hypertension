@@ -7,40 +7,38 @@
     <input class="search-input" placeholder="搜索患者姓名" />
     <image class="mic-icon" src="../../images/icon/麦克风.png" mode="widthFix" />
   </view>
-  <view class="patient-item" bindtap="gotoPatientDetail">
-    <view>
-      <view class="patient-name">张三</view>
-      <view class="patient-blood-pressure">最新血压 <text class="red">145/80 mmHg</text></view>
-    </view>
-    <view class="patient-right-icon">
-      <image class="speaker-icon-patient" src="../../images/icon/喇叭.png" mode="widthFix" bindtap="playPatientMessage" />
-      <image class="arrow-icon" src="../../images/icon/右箭头.png" mode="widthFix" />
+  
+  <!-- 加载中提示 -->
+  <view wx:if="{{loading}}" class="loading-text">加载中...</view>
+  
+  <!-- 患者列表 -->
+  <view wx:if="{{!loading && patientList.length > 0}}">
+    <view class="patient-item" wx:for="{{patientList}}" wx:key="user_id" bindtap="gotoPatientDetail" data-patient="{{item}}">
+      <view>
+        <view class="patient-name">{{item.name || '未命名'}}</view>
+        <view class="patient-blood-pressure">
+          <text wx:if="{{item.latestBp}}">
+            最新血压 
+            <text class="{{item.bpStatus === 'danger' ? 'red' : (item.bpStatus === 'warning' ? 'orange' : '')}}">
+              {{item.latestBp.systolic}}/{{item.latestBp.diastolic}} mmHg
+            </text>
+          </text>
+          <text wx:else class="no-bp">暂无血压记录</text>
+        </view>
+      </view>
+      <view class="patient-right-icon">
+        <image class="speaker-icon-patient" src="../../images/icon/喇叭.png" mode="widthFix" bindtap="playPatientMessage" catchtap="playPatientMessage" />
+        <image class="arrow-icon" src="../../images/icon/右箭头.png" mode="widthFix" />
+      </view>
     </view>
   </view>
-  <view class="patient-item" bindtap="gotoPatientDetail">
-    <view>
-      <view class="patient-name">李四</view>
-      <view class="patient-blood-pressure">最新血压 <text class="orange">138/79 mmHg</text></view>
-    </view>
-    <view class="patient-right-icon">
-      <image class="speaker-icon-patient" src="../../images/icon/喇叭.png" mode="widthFix" bindtap="playPatientMessage" />
-      <image class="arrow-icon" src="../../images/icon/右箭头.png" mode="widthFix" />
-    </view>
+  
+  <!-- 空状态 -->
+  <view wx:if="{{!loading && patientList.length === 0}}" class="empty-state">
+    <text>暂无患者数据</text>
   </view>
-  <view class="dots">
-    <view class="dot active"></view>
-    <view class="dot"></view>
-    <view class="dot"></view>
-    <view class="dot"></view>
-    <view class="dot"></view>
-    <view class="dot"></view>
-  </view>
-  <!-- 调整后：添加患者按钮在上 -->
-  <view class="add-patient-btn" bindtap="addPatient">
-    <view class="btn-text">+添加患者</view>
-    <image class="speaker-icon" src="../../images/icon/喇叭.png" mode="widthFix" />
-  </view>
-  <!-- 调整后：患者消息按钮在下 -->
+  
+  <!-- 患者消息按钮 -->
   <view class="add-patient-btn" bindtap="gotoPatientMessage">
     <view class="btn-text">患者消息</view>
     <image class="speaker-icon" src="../../images/icon/喇叭.png" mode="widthFix" />

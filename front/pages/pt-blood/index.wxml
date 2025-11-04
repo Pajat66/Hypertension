@@ -5,12 +5,20 @@
     <view class="title">血压历史</view>
   </view>
 
+  <view class="patient-name">{{patientName || '患者'}}</view>
+
   <!-- 折线图容器：宽度占满，突出数据展示 -->
   <canvas canvas-id="bpChart" class="chart-canvas"></canvas>
 
   <!-- 听方言解读按钮：居中显示，强化交互引导 -->
-  <view class="dialect-btn">
-    <text class="btn-text" bindtap="playDialect">听方言解读</text>
-    <image class="speaker-icon" src="../../images/icon/喇叭.png" mode="widthFix" bindtap="playVoice" />
+  <view class="dialect-btn" bindtap="playDialect">
+    <text class="btn-text">听方言解读</text>
+    <image class="speaker-icon" src="../../images/icon/喇叭.png" mode="widthFix" />
+  </view>
+  
+  <!-- 显示分析文本（可选） -->
+  <view wx:if="{{analysisText}}" class="analysis-display">
+    <view class="analysis-title">医生分析</view>
+    <view class="analysis-text">{{analysisText}}</view>
   </view>
 </view>
