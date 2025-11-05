@@ -407,6 +407,20 @@ def create_app():
         
         return jsonify({"ok": True, "medicine": medicine.to_dict()})
 
+    # 删除指定用药记录
+    @app.route("/api/patients/<int:user_id>/medicines/<int:med_id>", methods=["DELETE"])
+    def delete_medicine(user_id, med_id):
+        try:
+            med = Medicine.query.filter_by(user_id=user_id, med_id=med_id).first()
+            if not med:
+                return jsonify({"ok": False, "error": "用药记录不存在"}), 404
+            db.session.delete(med)
+            db.session.commit()
+            return jsonify({"ok": True})
+        except Exception as e:
+            db.session.rollback()
+            return jsonify({"ok": False, "error": "删除失败", "debug_info": str(e)}), 500
+
     # 添加医生留言API
     @app.route("/api/patients/<int:user_id>/messages", methods=["POST"])
     def create_message(user_id):

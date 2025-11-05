@@ -14,19 +14,24 @@
   <!-- 患者列表 -->
   <view wx:if="{{!loading && patientList.length > 0}}">
     <view class="patient-item" wx:for="{{patientList}}" wx:key="user_id" bindtap="gotoPatientDetail" data-patient="{{item}}">
-      <view>
-        <view class="patient-name">{{item.name || '未命名'}}</view>
-        <view class="patient-blood-pressure">
-          <text wx:if="{{item.latestBp}}">
-            最新血压 
-            <text class="{{item.bpStatus === 'danger' ? 'red' : (item.bpStatus === 'warning' ? 'orange' : '')}}">
-              {{item.latestBp.systolic}}/{{item.latestBp.diastolic}} mmHg
+      <view class="patient-info">
+        <view class="avatar">{{item.avatarChar}}</view>
+        <view>
+          <view class="patient-name">{{item.name || '未命名'}}</view>
+          <view class="patient-blood-pressure">
+            <text wx:if="{{item.latestBp}}">
+              最新血压 
+              <text class="{{item.bpStatus === 'danger' ? 'red' : (item.bpStatus === 'warning' ? 'orange' : 'green')}}">
+                {{item.latestBp.systolic}}/{{item.latestBp.diastolic}} mmHg
+              </text>
+              <text class="bp-badge {{item.bpStatus === 'danger' ? 'red' : (item.bpStatus === 'warning' ? 'orange' : 'green')}}">{{item.bpStatus === 'danger' ? '偏高' : (item.bpStatus === 'warning' ? '注意' : '正常')}}</text>
             </text>
-          </text>
-          <text wx:else class="no-bp">暂无血压记录</text>
+            <text wx:else class="no-bp">暂无血压记录</text>
+          </view>
         </view>
       </view>
       <view class="patient-right-icon">
+        <view class="med-btn" catchtap="openMedModal" data-patient="{{item}}">设置用药</view>
         <image class="speaker-icon-patient" src="../../images/icon/喇叭.png" mode="widthFix" bindtap="playPatientMessage" catchtap="playPatientMessage" />
         <image class="arrow-icon" src="../../images/icon/右箭头.png" mode="widthFix" />
       </view>
@@ -42,5 +47,57 @@
   <view class="add-patient-btn" bindtap="gotoPatientMessage">
     <view class="btn-text">患者消息</view>
     <image class="speaker-icon" src="../../images/icon/喇叭.png" mode="widthFix" />
+  </view>
+
+  <!-- 设置用药弹窗 -->
+  <view wx:if="{{showMedModal}}" class="modal-mask" catchtouchmove="true">
+    <view class="modal-panel">
+      <view class="modal-title">为 {{currentPatient.name}} 设置用药</view>
+      <scroll-view scroll-y="true" class="modal-body">
+        <!-- 已开药物 -->
+        <view wx:if="{{patientMeds && patientMeds.length>0}}" class="exist-title">已开药物</view>
+        <view wx:if="{{patientMeds && patientMeds.length>0}}" class="exist-list">
+          <view class="exist-row" wx:for="{{patientMeds}}" wx:key="med_id">
+            <view class="exist-main">
+              <view class="med-name">{{item.drug_name}}</view>
+              <view class="med-dose">{{item.dose}} · {{item.frequency}}</view>
+            </view>
+            <button class="btn-danger" data-medid="{{item.med_id}}" bindtap="deleteExistingMed">删除</button>
+          </view>
+        </view>
+
+        <view class="med-row" wx:for="{{selectedMeds}}" wx:key="name" bindtap="toggleMedCheck" data-index="{{index}}">
+          <view class="med-left">
+            <view class="check {{item.checked?'checked':''}}">{{item.checked?'✓':''}}</view>
+            <view>
+              <view class="med-name">{{item.name}}</view>
+              <view class="med-dose">剂量：<input class="dose-input" value="{{item.dosage}}" placeholder="如 1片/次" data-index="{{index}}" bindinput="onEditDosage" /></view>
+            </view>
+          </view>
+          <picker mode="selector" range="{{timeOptions}}" value="{{item.timeIndex}}" data-index="{{index}}" bindchange="onTimeChange" catchtap="true">
+            <view class="time-chip">{{timeOptions[item.timeIndex]}}</view>
+          </picker>
+        </view>
+      </scroll-view>
+
+      <!-- 自定义添加药物 -->
+      <view class="custom-med">
+        <view class="custom-title">自定义药物</view>
+        <view class="custom-row">
+          <input class="custom-input" placeholder="药物名称" value="{{customName}}" bindinput="onCustomName" />
+          <input class="custom-input" placeholder="剂量（如1片/次）" value="{{customDose}}" bindinput="onCustomDose" />
+        </view>
+        <view class="custom-row">
+          <picker mode="selector" range="{{timeOptions}}" value="{{customTimeIndex}}" bindchange="onCustomTime">
+            <view class="time-chip">{{timeOptions[customTimeIndex]}}</view>
+          </picker>
+          <button class="btn-add" bindtap="addCustomMed">添加</button>
+        </view>
+      </view>
+      <view class="modal-actions">
+        <button class="btn-cancel" bindtap="closeMedModal">取消</button>
+        <button class="btn-primary" bindtap="saveMedications">保存</button>
+      </view>
+    </view>
   </view>
 </view>
