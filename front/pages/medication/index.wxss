@@ -62,13 +62,14 @@
 .medication-card {
   display: flex;
   align-items: center;
-  padding: 20px;
-  margin-bottom: 15px;
-  background-color: #f6ffca;
-  border: 1px solid rgba(0,0,0,0.15);
-  border-radius: 12px;
+  gap: 12px;
+  padding: 18px;
+  margin-bottom: 16px;
+  background: linear-gradient(180deg, #f6ffca 0%, #ffffff 100%);
+  border: 1px solid rgba(0,0,0,0.08);
+  border-radius: 16px;
   box-sizing: border-box;
-  box-shadow: inset -5px -5px 5px rgba(0, 0, 0, 0.1);
+  box-shadow: 0 6rpx 18rpx rgba(0,0,0,0.06);
 }
 
 /* 复选框样式 */
@@ -103,14 +104,44 @@
 }
 
 .medication-name {
-  font-size: 34px;
+  font-size: 32px;
   font-weight: 700;
   color: #000;
-  display: block;
-  margin-bottom: 8px;
 }
 
 .medication-detail {
-  font-size: 28px;
+  font-size: 26px;
   color: #666;
 }
+
+.pill-icon {
+  font-size: 30px;
+}
+
+.row-top {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 8px;
+}
+
+.time-chip {
+  background: #f0f6ff;
+  color: #246bff;
+  padding: 6rpx 14rpx;
+  border-radius: 12rpx;
+  font-size: 22rpx;
+}
+
+/* 空状态 */
+.empty-wrap {
+  margin-top: 80rpx;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  color: #666;
+}
+.empty-icon { width: 140rpx; height: 140rpx; margin-bottom: 24rpx; }
+.empty-title { font-size: 50rpx; color: #333; font-weight: 700; margin-bottom: 8rpx; }
+.empty-sub { font-size: 40rpx; color: #999; margin-bottom: 20rpx; }
+.empty-refresh { background: #4285f4; color: #fff; border: none; }
