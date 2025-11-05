@@ -58,16 +58,17 @@
 }
 
 .patient-item {
-  width: 520rpx;
-  background-color: #f6ffca;
-  border: 1px solid rgba(0,0,0,0.15);
-  border-radius: 12px;
-  padding: 15px;
-  margin-bottom: 15px;
+  width: 100%;
+  background: linear-gradient(180deg, #f6ffca 0%, #ffffff 100%);
+  border: 1px solid rgba(0,0,0,0.06);
+  border-radius: 16px;
+  padding: 18px;
+  margin-bottom: 16px;
   display: flex;
   align-items: center;
+  justify-content: space-between;
   box-sizing: border-box;
-  box-shadow: inset -5px -5px 5px rgba(0, 0, 0, 0.1);
+  box-shadow: 0 6rpx 18rpx rgba(0, 0, 0, 0.06);
 }
 
 .patient-checkbox {
@@ -95,22 +96,16 @@
   font-weight: bold;
 }
 
-.patient-info {
-  flex: 1;
-}
+.patient-info { flex: 1; display: flex; align-items: center; gap: 16rpx; }
+.avatar { width: 64rpx; height: 64rpx; border-radius: 50%; background: #d7f2ff; display: flex; align-items: center; justify-content: center; color: #246bff; font-weight: 700; }
 
-.patient-name {
-  font-size: 28px;
-  font-weight: 700;
-  color: #000;
-  display: block;
-  margin-bottom: 6px;
-}
+.patient-name { font-size: 30px; font-weight: 700; color: #000; display: block; margin-bottom: 6px; }
 
-.patient-blood-pressure {
-  font-size: 22px;
-  color: #666;
-}
+.patient-blood-pressure { font-size: 24px; color: #666; }
+.bp-badge { padding: 4rpx 10rpx; border-radius: 10rpx; font-size: 20rpx; margin-left: 8rpx; }
+.bp-badge.red { background: #ffe7e7; color: #d93025; }
+.bp-badge.orange { background: #fff1e3; color: #f96500; }
+.bp-badge.green { background: #e9fbec; color: #2e7d32; }
 
 .red {
   color: red;
@@ -133,6 +128,14 @@
   display: flex;
   align-items: center;
   gap: 15rpx;
+}
+
+.med-btn {
+  background-color: #4285f4;
+  color: #fff;
+  font-size: 22rpx;
+  padding: 8rpx 16rpx;
+  border-radius: 10rpx;
 }
 
 .speaker-icon-patient {
@@ -218,6 +221,148 @@
 .speaker-icon-small {
   width: 40rpx;
   height: 40rpx;
+}
+
+/* 弹窗样式 */
+.modal-mask {
+  position: fixed;
+  left: 0;
+  right: 0;
+  top: 0;
+  bottom: 0;
+  background: rgba(0,0,0,0.4);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 9999;
+}
+
+.modal-panel {
+  width: 640rpx;
+  max-height: 80vh;
+  background: #fff;
+  border-radius: 20rpx;
+  box-shadow: 0 12rpx 40rpx rgba(0,0,0,0.2);
+  display: flex;
+  flex-direction: column;
+}
+
+.modal-title {
+  font-size: 34rpx;
+  font-weight: 700;
+  color: #222;
+  padding: 24rpx 28rpx;
+  border-bottom: 1px solid #eee;
+}
+
+.modal-body {
+  padding: 16rpx 24rpx;
+  max-height: 56vh;
+}
+.exist-title { font-size: 28rpx; color: #555; margin: 8rpx 0; }
+.exist-list { margin-bottom: 10rpx; }
+.exist-row { display: flex; align-items: center; justify-content: space-between; padding: 14rpx 0; border-bottom: 1px dashed #eee; }
+.exist-main { display:flex; flex-direction: column; }
+.btn-danger { background: #ff4d4f; color: #fff; border: none; padding: 8rpx 16rpx; border-radius: 8rpx; }
+
+.custom-med {
+  padding: 0 24rpx 16rpx;
+}
+.custom-title {
+  font-size: 28rpx;
+  color: #333;
+  margin: 8rpx 0 12rpx;
+}
+.custom-row {
+  display: flex;
+  align-items: center;
+  gap: 16rpx;
+  margin-bottom: 12rpx;
+}
+.custom-input {
+  flex: 1;
+  background: #f7f7f7;
+  border-radius: 10rpx;
+  padding: 16rpx;
+  font-size: 26rpx;
+}
+.btn-add {
+  background: #07c160;
+  color: #fff;
+  border: none;
+  padding: 12rpx 24rpx;
+  border-radius: 10rpx;
+  font-size: 26rpx;
+}
+
+.med-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 20rpx 0;
+  border-bottom: 1px dashed #eee;
+}
+
+.med-left {
+  display: flex;
+  align-items: center;
+  gap: 16rpx;
+}
+
+.check {
+  width: 36rpx;
+  height: 36rpx;
+  border-radius: 8rpx;
+  border: 2rpx solid #bbb;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: #fff;
+}
+
+.check.checked {
+  background: #07c160;
+  border-color: #07c160;
+}
+
+.med-name {
+  font-size: 30rpx;
+  font-weight: 700;
+}
+
+.med-dose {
+  font-size: 24rpx;
+  color: #666;
+}
+.dose-input { display: inline-block; min-width: 200rpx; padding: 8rpx 12rpx; background: #f7f7f7; border-radius: 8rpx; margin-left: 6rpx; }
+
+.time-chip {
+  background: #f0f6ff;
+  color: #246bff;
+  padding: 10rpx 16rpx;
+  border-radius: 12rpx;
+  font-size: 24rpx;
+}
+
+.modal-actions {
+  display: flex;
+  justify-content: space-between;
+  padding: 20rpx 24rpx 24rpx;
+  gap: 20rpx;
+}
+
+.btn-cancel {
+  flex: 1;
+  background: #eee;
+  color: #333;
+  border: none;
+}
+
+.btn-primary {
+  flex: 1;
+  background: #4285f4;
+  color: #fff;
+  border: none;
 }
 
 .loading-text {

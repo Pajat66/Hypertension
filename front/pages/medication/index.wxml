@@ -13,17 +13,29 @@
     </text>
   </view>
 
+  <!-- 空状态提示 -->
+  <view wx:if="{{!medications || medications.length === 0}}" class="empty-wrap">
+    <image class="empty-icon" src="/images/icon/医生.png" mode="widthFix" />
+    <view class="empty-title">医生还未为你设定药物处方</view>
+    <view class="empty-sub">请稍后再来查看，或联系您的驻村医生</view>
+    <button class="empty-refresh" bindtap="onShow">刷新</button>
+  </view>
+
   <!-- 药品列表 -->
-  <view class="medication-list">
+  <view wx:else class="medication-list">
     <view class="medication-card" wx:for="{{medications}}" wx:key="id" data-id="{{item.id}}" bindtap="toggleMedicationStatus">
+      <view class="pill-icon">💊</view>
       <view class="checkbox">
         <view class="checkbox-inner" wx:if="{{item.isTaken}}">
           <text>✓</text>
         </view>
       </view>
       <view class="medication-info">
-        <text class="medication-name">{{item.name}}</text>
-        <text class="medication-detail">{{item.time}} · {{item.dosage}}</text>
+        <view class="row-top">
+          <text class="medication-name">{{item.name}}</text>
+          <view class="time-chip">{{item.time}}</view>
+        </view>
+        <text class="medication-detail">{{item.dosage}}</text>
       </view>
     </view>
   </view>

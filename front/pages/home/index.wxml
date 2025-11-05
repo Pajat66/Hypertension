@@ -26,7 +26,7 @@
         <view>
           <text class="title-large">查用药</text>
           <view style="height:8px;"></view>
-          <text style="font-size:25px;font-weight: 700;">说收缩压、舒张压</text>
+          <text style="font-size:25px;font-weight: 700;">查看医生所开药物</text>
         </view>
         <image src="/images/icon/麦克风.png" style="width:36px;height:36px;" />
       </view>
