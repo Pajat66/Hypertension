@@ -13,7 +13,7 @@ App({
       console.log('API_BASE设置为:', this.globalData.API_BASE)
     } catch (error) {
       console.log('获取环境信息失败:', error)
-      this.globalData.API_BASE = 'http://192.168.150.117:5000/api'
+      this.globalData.API_BASE = 'http://192.168.164.117:5000/api'
       console.log('使用默认API_BASE:', this.globalData.API_BASE)
     }
   }
