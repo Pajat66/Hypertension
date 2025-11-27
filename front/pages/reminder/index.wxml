@@ -1,6 +1,6 @@
 <view class="container">
   <view class="header">
-    <image class="back-icon" src="../../images/icon/返回 .png" mode="widthFix" bindtap="goBack" />
+    <image class="back-icon" src="../../images/icon/back.png" mode="widthFix" bindtap="goBack" />
   </view>
   <text style="width:260px;height:35px;display:block;margin:0 auto 18px auto;"></text>
   <view class="title">批量提醒</view>

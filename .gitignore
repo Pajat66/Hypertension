@@ -90,3 +90,4 @@ junit.xml
 # 忽略上传的媒体或数据文件（如果不想入库）
 uploads/
 media/
+.aider*

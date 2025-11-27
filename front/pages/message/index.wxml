@@ -1,7 +1,7 @@
 <view class="container">
   <!-- 顶部导航 -->
   <view class="header">
-    <image class="back-icon" src="../../images/icon/返回 .png" mode="widthFix" bindtap="goBack" />
+    <image class="back-icon" src="../../images/icon/back.png" mode="widthFix" bindtap="goBack" />
     <view class="title">患者消息</view>
   </view>
 

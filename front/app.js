@@ -13,7 +13,7 @@ App({
       // 根据环境设置不同的 API 地址
       switch (env) {
         case 'develop':
-          this.globalData.API_BASE = 'http://192.168.164.117:5000'; // 开发环境IP
+          this.globalData.API_BASE = 'http://192.168.119.117:5000'; // 开发环境IP
           break;
         case 'trial':
           this.globalData.API_BASE = 'https://your-trial-server.com'; // 测试环境域名
@@ -22,7 +22,7 @@ App({
           this.globalData.API_BASE = 'https://your-production-server.com'; // 生产环境域名
           break;
         default:
-          this.globalData.API_BASE = 'http://192.168.164.117:5000'; // 默认指向开发环境
+          this.globalData.API_BASE = 'http://192.168.119.117:5000'; // 默认指向开发环境
           break;
       }
       

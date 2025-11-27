@@ -10,6 +10,7 @@ from datetime import datetime, timezone, timedelta
 from flask import Flask, jsonify, send_from_directory, request
 from flask_cors import CORS
 from werkzeug.security import generate_password_hash, check_password_hash
+import hashlib
 from models import (
     db, Patient, Doctor, BpRecord, Medicine, DocMsg, Reminder, ChatMessage, 
     DoctorReminder, PatientReminder, BpAnalysis,
@@ -26,7 +27,7 @@ class Config:
     SQLALCHEMY_DATABASE_URI = os.environ.get(
         "DATABASE_URL",
         # 建议将此连接字符串移至环境变量
-        "mysql+pymysql://project:Zbp42682600@192.168.164.117:3306/hypertension_db?charset=utf8mb4"
+        "mysql+pymysql://project:Zbp42682600@192.168.119.117:3306/hypertension_db?charset=utf8mb4"
     )
     SQLALCHEMY_TRACK_MODIFICATIONS = False
 
@@ -525,8 +526,41 @@ def create_app():
             return jsonify({"error": "手机号和密码不能为空"}), 400
         
         doctor = Doctor.query.filter_by(phone=phone).first()
-        
-        if not doctor or not doctor.password_hash or not check_password_hash(doctor.password_hash, password):
+
+        if not doctor or not doctor.password_hash:
+            return jsonify({"error": "手机号或密码错误"}), 401
+
+        # 首先尝试 werkzeug 的 check_password_hash
+        valid = False
+        try:
+            valid = check_password_hash(doctor.password_hash, password)
+        except Exception:
+            valid = False
+
+        # 如果不匹配，尝试向后兼容旧的 MD5 或明文存储；若匹配则自动升级为 werkzeug hash
+        if not valid:
+            try:
+                stored = (doctor.password_hash or "")
+                # MD5 hex 长度为32
+                if re.match(r'^[A-Fa-f0-9]{32}$', stored):
+                    if hashlib.md5(password.encode('utf-8')).hexdigest() == stored:
+                        valid = True
+                # 极少情况：数据库中存的是明文密码
+                elif stored == password:
+                    valid = True
+
+                if valid:
+                    try:
+                        doctor.password_hash = generate_password_hash(password)
+                        db.session.commit()
+                        print(f"已将医生 {doctor.worker_id} 的密码升级为新的哈希格式")
+                    except Exception as e:
+                        db.session.rollback()
+                        print(f"密码升级失败: {e}")
+            except Exception as e:
+                print(f"尝试旧密码兼容时出错: {e}")
+
+        if not valid:
             return jsonify({"error": "手机号或密码错误"}), 401
         
         return jsonify({
@@ -547,8 +581,39 @@ def create_app():
             return jsonify({"error": "手机号和密码不能为空"}), 400
         
         patient = Patient.query.filter_by(phone=phone).first()
-        
-        if not patient or not patient.password_hash or not check_password_hash(patient.password_hash, password):
+
+        if not patient or not patient.password_hash:
+            return jsonify({"error": "手机号或密码错误"}), 401
+
+        # 首先使用 werkzeug 验证
+        valid = False
+        try:
+            valid = check_password_hash(patient.password_hash, password)
+        except Exception:
+            valid = False
+
+        # 向后兼容：MD5 或明文
+        if not valid:
+            try:
+                stored = (patient.password_hash or "")
+                if re.match(r'^[A-Fa-f0-9]{32}$', stored):
+                    if hashlib.md5(password.encode('utf-8')).hexdigest() == stored:
+                        valid = True
+                elif stored == password:
+                    valid = True
+
+                if valid:
+                    try:
+                        patient.password_hash = generate_password_hash(password)
+                        db.session.commit()
+                        print(f"已将患者 {patient.user_id} 的密码升级为新的哈希格式")
+                    except Exception as e:
+                        db.session.rollback()
+                        print(f"密码升级失败: {e}")
+            except Exception as e:
+                print(f"尝试旧密码兼容时出错: {e}")
+
+        if not valid:
             return jsonify({"error": "手机号或密码错误"}), 401
         
         return jsonify({
