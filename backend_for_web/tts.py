@@ -16,9 +16,9 @@ from datetime import datetime, timezone
 from websocket import create_connection
 
 # 从环境变量读取密钥（避免写死）
-XFYUN_APPID  = "02224038"
-XFYUN_APIKEY = "844dcee8036ecabe4707a3c98a354608"
-XFYUN_SECRET = "YmRmOTU2OTU5ZDY1NGM4NTg4MzJjOWU5"
+XFYUN_APPID  = os.environ.get("XFYUN_APPID", "02224038")
+XFYUN_APIKEY = os.environ.get("XFYUN_APIKEY", "844dcee8036ecabe4707a3c98a354608")
+XFYUN_SECRET = os.environ.get("XFYUN_SECRET", "YmRmOTU2OTU5ZDY1NGM4NTg4MzJjOWU5")
 
 # 主机 & 路径分开
 IAT_HOST = "wss://iat-api.xfyun.cn"

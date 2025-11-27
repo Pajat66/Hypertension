@@ -2,39 +2,29 @@
 
 .container {
   position: relative;
+  padding: 18px;
 }
 
-
-
-
-.logout-chip--hover {
-  background: #f7f7f7;
+.spacer-8 {
+  height: 8px;
 }
 
-
-/* --- refined placement near name --- */
-.name-row { position: relative; padding-left: 24rpx; margin: 12rpx 0 8rpx; }
-.name-text { font-size: 28rpx; font-weight: 700; color: #333; }
-
-/* Hide any stray logout buttons not inside name-row */
-.container > .logout-chip { display: none; }
-
-.name-row{
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  position: absolute;
-  left: 0;
-  top: -30rpx; /* slightly above the name */
-  z-index: 10;
-  padding: 16rpx 36rpx; /* larger pill */
-  border-radius: 999rpx;
-  background: #ffffff;
-  color: #333;
-  font-size: 30rpx;
-  border: 2rpx solid #e8e8e8;
-  box-shadow: 0 8rpx 20rpx rgba(0,0,0,0.08);
+.logo-placeholder {
+  width: 260px;
+  height: 100px;
+  display: block;
+  margin: 0 auto 18px auto;
 }
+
+.page-header {
+  padding-left: 12px;
+}
+
+.user-name {
+  font-size: 35px;
+  font-weight: 700;
+}
+
 .logout-fab {
   position: fixed;
   top: 100rpx;
@@ -48,4 +38,64 @@
   font-weight: 800;
   border: 2rpx solid #e8e8e8;
   box-shadow: 0 8rpx 20rpx rgba(0,0,0,0.08);
+}
+
+.logout-fab--hover {
+  background: #f7f7f7;
+}
+
+.card-group {
+  padding: 12px;
+}
+
+.home-card {
+  margin-bottom: 14px;
+  border-radius: 12px;
+  padding: 18px;
+}
+
+.card-content {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.card-subtitle {
+  font-size: 25px;
+  font-weight: 700;
+}
+
+.card-icon {
+  width: 36px;
+  height: 36px;
+}
+
+.card-icon-speaker {
+  width: 35px;
+  height: 35px;
+}
+
+.sub-actions {
+  display: flex;
+  gap: 12px;
+  margin-top: 8px;
+}
+
+.sub-card {
+  flex: 1;
+  border-radius: 12px;
+  padding: 20px;
+  text-align: center;
+}
+
+.sub-card-icon {
+  width: 50px;
+  height: 50px;
+  display: block;
+  margin: 0 auto 18px auto;
+}
+
+.sub-card-title {
+  font-size: 30px;
+  font-weight: 600;
 }

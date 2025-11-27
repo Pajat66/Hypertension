@@ -49,7 +49,7 @@ Page({
     wx.showToast({ title: '注册中...', icon: 'loading', duration: 2000 });
     
     try {
-      const result = await request('/doctors/register', {
+      const result = await request('/api/doctors/register', {
         method: 'POST',
         data: {
           name,

@@ -52,7 +52,7 @@ Page({
     if (!patientId || !doctorId) return
     
     try {
-      const result = await request('/chat/messages', {
+      const result = await request('/api/chat/messages', {
         method: 'GET',
         data: {
           patient_id: patientId,
@@ -93,7 +93,7 @@ Page({
     if (!patientId || !doctorId) return
     
     try {
-      await request('/chat/mark_read', {
+      await request('/api/chat/mark_read', {
         method: 'POST',
         data: {
           patient_id: patientId,
@@ -130,7 +130,7 @@ Page({
     })
 
     try {
-      const result = await request('/chat/send', {
+      const result = await request('/api/chat/send', {
         method: 'POST',
         data: {
           patient_id: patientId,

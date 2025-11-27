@@ -26,7 +26,7 @@ Page({
     
     try {
       console.log('正在发送登录请求...');
-      const result = await request('/doctors/login', {
+      const result = await request('/api/doctors/login', {
         method: 'POST',
         header: {
           'Content-Type': 'application/json'

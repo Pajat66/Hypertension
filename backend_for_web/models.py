@@ -1,4 +1,3 @@
-
 from flask_sqlalchemy import SQLAlchemy
 from datetime import datetime, timezone, date, time, timedelta
 from enum import Enum
@@ -33,6 +32,7 @@ class Patient(db.Model):
     user_id = db.Column(db.Integer, primary_key=True, autoincrement=True)
     username = db.Column(db.String(100))
     phone = db.Column(db.String(20), unique=True, nullable=False, index=True)
+    password_hash = db.Column(db.String(255))
     name = db.Column(db.String(100))
     id_card = db.Column(db.String(32))
     gender = db.Column(db.Enum(GenderEnum), default=GenderEnum.U)
@@ -76,7 +76,8 @@ class Doctor(db.Model):
     worker_id = db.Column(db.Integer, primary_key=True, autoincrement=True)
     name = db.Column(db.String(100), nullable=False)
     role = db.Column(db.String(50), index=True)
-    phone = db.Column(db.String(20))
+    phone = db.Column(db.String(20), unique=True, nullable=False, index=True)
+    password_hash = db.Column(db.String(255))
     village = db.Column(db.String(200), index=True)
     created_at = db.Column(db.DateTime, default=datetime.now(timezone.utc))
     

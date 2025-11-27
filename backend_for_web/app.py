@@ -9,6 +9,7 @@ from datetime import datetime, timezone, timedelta
 
 from flask import Flask, jsonify, send_from_directory, request
 from flask_cors import CORS
+from werkzeug.security import generate_password_hash, check_password_hash
 from models import (
     db, Patient, Doctor, BpRecord, Medicine, DocMsg, Reminder, ChatMessage, 
     DoctorReminder, PatientReminder, BpAnalysis,
@@ -24,7 +25,7 @@ class Config:
     SECRET_KEY = os.environ.get("SECRET_KEY", "dev-secret")
     SQLALCHEMY_DATABASE_URI = os.environ.get(
         "DATABASE_URL",
-        # 更换网络时记得改 IP
+        # 建议将此连接字符串移至环境变量
         "mysql+pymysql://project:Zbp42682600@192.168.164.117:3306/hypertension_db?charset=utf8mb4"
     )
     SQLALCHEMY_TRACK_MODIFICATIONS = False
@@ -58,7 +59,7 @@ def create_app():
     app.config.from_object(Config)
 
     # 允许所有路由的跨域访问
-    CORS(app, resources={r"/*": {
+    CORS(app, resources={r"/api/*": {
         "origins": "*",
         "methods": ["GET", "POST", "PUT", "DELETE", "OPTIONS"],
         "allow_headers": ["Content-Type", "Authorization"]
@@ -512,7 +513,7 @@ def create_app():
         return jsonify({"ok": True, "doctor": doctor.to_dict()})
 
     # 添加登录API
-    @app.route("/doctors/login", methods=["POST"])
+    @app.route("/api/doctors/login", methods=["POST"])
     def doctor_login():
         """医生登录"""
         data = request.get_json(silent=True) or {}
@@ -523,19 +524,14 @@ def create_app():
         if not phone or not password:
             return jsonify({"error": "手机号和密码不能为空"}), 400
         
-        # 查找医生（这里简化处理，实际项目中应该有密码加密）
         doctor = Doctor.query.filter_by(phone=phone).first()
-        if not doctor:
-            return jsonify({"error": "医生不存在"}), 404
         
-        # 这里简化密码验证，实际项目中应该使用加密密码
-        # 暂时使用手机号后4位作为密码进行演示
-        if password != phone[-4:]:
-            return jsonify({"error": "密码错误"}), 401
+        if not doctor or not doctor.password_hash or not check_password_hash(doctor.password_hash, password):
+            return jsonify({"error": "手机号或密码错误"}), 401
         
         return jsonify({
             "ok": True,
-            "token": f"doctor_{doctor.worker_id}_{phone}",  # 简单的token生成
+            "token": f"doctor_{doctor.worker_id}_{uuid.uuid4().hex}",
             "user": doctor.to_dict(),
             "user_type": "doctor"
         })
@@ -550,19 +546,14 @@ def create_app():
         if not phone or not password:
             return jsonify({"error": "手机号和密码不能为空"}), 400
         
-        # 查找患者
         patient = Patient.query.filter_by(phone=phone).first()
-        if not patient:
-            return jsonify({"error": "患者不存在"}), 404
         
-        # 这里简化密码验证，实际项目中应该使用加密密码
-        # 暂时使用手机号后4位作为密码进行演示
-        if password != phone[-4:]:
-            return jsonify({"error": "密码错误"}), 401
+        if not patient or not patient.password_hash or not check_password_hash(patient.password_hash, password):
+            return jsonify({"error": "手机号或密码错误"}), 401
         
         return jsonify({
             "ok": True,
-            "token": f"patient_{patient.user_id}_{phone}",  # 简单的token生成
+            "token": f"patient_{patient.user_id}_{uuid.uuid4().hex}",
             "user": patient.to_dict(),
             "user_type": "patient"
         })
@@ -580,30 +571,26 @@ def create_app():
         role = data.get("role", "村医").strip()
         village = data.get("village", "").strip()
         
-        # 验证必填字段
         if not all([name, phone, password, confirm_password]):
             return jsonify({"error": "请完整填写必填信息"}), 400
         
-        # 验证密码
         if password != confirm_password:
             return jsonify({"error": "两次密码不一致"}), 400
         
         if len(password) < 4:
             return jsonify({"error": "密码长度不能少于4位"}), 400
         
-        # 验证手机号格式
         if not phone.isdigit() or len(phone) != 11:
             return jsonify({"error": "请输入正确的手机号"}), 400
         
-        # 检查手机号是否已存在
-        existing_doctor = Doctor.query.filter_by(phone=phone).first()
-        if existing_doctor:
+        if Doctor.query.filter_by(phone=phone).first():
             return jsonify({"error": "该手机号已被注册"}), 400
         
-        # 创建新医生
+        hashed_password = generate_password_hash(password)
         doctor = Doctor(
             name=name,
             phone=phone,
+            password_hash=hashed_password,
             role=role,
             village=village
         )
@@ -611,7 +598,6 @@ def create_app():
         try:
             db.session.add(doctor)
             db.session.commit()
-            
             return jsonify({
                 "ok": True,
                 "message": "注册成功",
@@ -633,30 +619,26 @@ def create_app():
         village = data.get("village", "").strip()
         dialect = data.get("dialect", "普通话").strip()
         
-        # 验证必填字段
         if not all([name, phone, password, confirm_password]):
             return jsonify({"error": "请完整填写必填信息"}), 400
         
-        # 验证密码
         if password != confirm_password:
             return jsonify({"error": "两次密码不一致"}), 400
         
         if len(password) < 4:
             return jsonify({"error": "密码长度不能少于4位"}), 400
         
-        # 验证手机号格式
         if not phone.isdigit() or len(phone) != 11:
             return jsonify({"error": "请输入正确的手机号"}), 400
         
-        # 检查手机号是否已存在
-        existing_patient = Patient.query.filter_by(phone=phone).first()
-        if existing_patient:
+        if Patient.query.filter_by(phone=phone).first():
             return jsonify({"error": "该手机号已被注册"}), 400
         
-        # 创建新患者
+        hashed_password = generate_password_hash(password)
         patient = Patient(
             name=name,
             phone=phone,
+            password_hash=hashed_password,
             gender=GenderEnum(gender),
             village=village,
             dialect=dialect
@@ -665,7 +647,6 @@ def create_app():
         try:
             db.session.add(patient)
             db.session.commit()
-            
             return jsonify({
                 "ok": True,
                 "message": "注册成功",
@@ -1064,8 +1045,7 @@ def create_app():
     # 聊天消息API
     # =========================
     
-    @app.route("/chat/send", methods=["POST", "OPTIONS"])
-    @app.route("/api/chat/send", methods=["POST", "OPTIONS"])  # 兼容旧路由
+    @app.route("/api/chat/send", methods=["POST", "OPTIONS"])
     def send_chat_message():
         """发送聊天消息"""
         # 处理 OPTIONS 请求
@@ -1111,8 +1091,7 @@ def create_app():
         
         return jsonify({"ok": True, "message": message.to_dict()})
     
-    @app.route("/chat/messages", methods=["GET", "OPTIONS"])
-    @app.route("/api/chat/messages", methods=["GET", "OPTIONS"])  # 兼容旧路由
+    @app.route("/api/chat/messages", methods=["GET", "OPTIONS"])
     def get_chat_messages():
         """获取聊天消息列表"""
         # 处理 OPTIONS 请求
@@ -1150,8 +1129,7 @@ def create_app():
             print(f"错误: 获取消息失败 - {str(e)}")
             return jsonify({"error": "获取消息失败"}), 500
     
-    @app.route("/chat/last_message/<int:patient_id>/<int:doctor_id>", methods=["GET", "OPTIONS"])
-    @app.route("/api/chat/last_message/<int:patient_id>/<int:doctor_id>", methods=["GET", "OPTIONS"])  # 兼容旧路由
+    @app.route("/api/chat/last_message/<int:patient_id>/<int:doctor_id>", methods=["GET", "OPTIONS"])
     def get_last_message(patient_id, doctor_id):
         """获取最后一条消息（用于聊天列表显示）"""
         # 处理 OPTIONS 请求
@@ -1171,8 +1149,7 @@ def create_app():
             return jsonify({"ok": True, "message": last_message.to_dict()})
         return jsonify({"ok": True, "message": None})
     
-    @app.route("/chat/mark_read", methods=["POST", "OPTIONS"])
-    @app.route("/api/chat/mark_read", methods=["POST", "OPTIONS"])  # 兼容旧路由
+    @app.route("/api/chat/mark_read", methods=["POST", "OPTIONS"])
     def mark_messages_read():
         """标记消息为已读"""
         # 处理 OPTIONS 请求
@@ -1206,8 +1183,7 @@ def create_app():
         
         return jsonify({"ok": True, "updated_count": len(unread_messages)})
     
-    @app.route("/chat/unread_count", methods=["GET", "OPTIONS"])
-    @app.route("/api/chat/unread_count", methods=["GET", "OPTIONS"])  # 兼容旧路由
+    @app.route("/api/chat/unread_count", methods=["GET", "OPTIONS"])
     def get_unread_count():
         """获取未读消息数量"""
         # 处理 OPTIONS 请求
@@ -1236,7 +1212,7 @@ def create_app():
         
         return jsonify({"ok": True, "unread_count": count})
     
-    @app.route("/patients/<int:user_id>/doctors", methods=["GET"])
+    @app.route("/api/patients/<int:user_id>/doctors", methods=["GET"])
     def get_patient_doctors(user_id):
         """获取患者所在村庄的医生列表"""
         try:
@@ -1279,7 +1255,7 @@ def create_app():
                 "debug_info": str(e)
             }), 500
     
-    @app.route("/doctors/<int:doctor_id>/patients", methods=["GET"])
+    @app.route("/api/doctors/<int:doctor_id>/patients", methods=["GET"])
     def get_doctor_patients(doctor_id):
         """获取医生所在村庄的患者列表"""
         try:
@@ -1362,9 +1338,9 @@ def create_app():
     @app.route("/", defaults={"path": ""})
     @app.route("/<path:path>")
     def spa(path):
-        # 跳过 /static/ 路径，由上面的路由处理
-        if path.startswith("static/"):
-            return jsonify({"error": "静态文件路由未匹配"}), 404
+        # 跳过 /static/ 和 /api/ 路径
+        if path.startswith("static/") or path.startswith("api/"):
+            return jsonify({"error": "静态文件或API路由未匹配"}), 404
         
         file_path = os.path.join(static_dir, path)
         if path and os.path.exists(file_path):
@@ -1424,6 +1400,7 @@ if __name__ == "__main__":
                 name="张大爷", 
                 gender=GenderEnum.M, 
                 phone="13800000001",
+                password_hash=generate_password_hash("0001"),
                 village="示例村",
                 dialect="普通话"
             )
@@ -1433,6 +1410,7 @@ if __name__ == "__main__":
                 name="李阿姨", 
                 gender=GenderEnum.F, 
                 phone="13900000002",
+                password_hash=generate_password_hash("0002"),
                 village="示例村",
                 dialect="普通话"
             )
@@ -1443,6 +1421,7 @@ if __name__ == "__main__":
                 name="王医生",
                 role="村医",
                 phone="13700000001",
+                password_hash=generate_password_hash("0001"),
                 village="示例村"
             )
             db.session.add(demo_doctor)
@@ -1451,6 +1430,7 @@ if __name__ == "__main__":
                 name="刘医生",
                 role="主治医师",
                 phone="13600000002",
+                password_hash=generate_password_hash("0002"),
                 village="示例村"
             )
             db.session.add(demo_doctor2)

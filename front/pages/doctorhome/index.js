@@ -40,7 +40,7 @@ Page({
 
     const apiBase = app.globalData.API_BASE
     wx.request({
-      url: `${apiBase}/doctors/${doctorId}/patients`,
+      url: `${apiBase}/api/doctors/${doctorId}/patients`,
       header: {
         'Content-Type': 'application/json'
       },

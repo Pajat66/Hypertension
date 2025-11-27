@@ -44,7 +44,7 @@ Page({
     console.log('正在获取医生列表，患者ID:', patientId);
 
     wx.request({
-      url: `${apiBase}/patients/${patientId}/doctors`,
+      url: `${apiBase}/api/patients/${patientId}/doctors`,
       header: {
         'Content-Type': 'application/json'
       },
@@ -77,7 +77,7 @@ Page({
     doctors.forEach((doctor, index) => {
       // 加载最后一条消息
       wx.request({
-        url: `${apiBase}/chat/last_message/${patientId}/${doctor.worker_id}`,
+        url: `${apiBase}/api/chat/last_message/${patientId}/${doctor.worker_id}`,
         success: (res) => {
           if (res.data.ok && res.data.message) {
             doctors[index].lastMessage = res.data.message.content
@@ -95,7 +95,7 @@ Page({
 
       // 加载未读消息数
       wx.request({
-        url: `${apiBase}/chat/unread_count`,
+        url: `${apiBase}/api/chat/unread_count`,
         data: {
           patient_id: patientId,
           doctor_id: doctor.worker_id,
@@ -158,4 +158,3 @@ Page({
     }, 1000)
   }
 })
-

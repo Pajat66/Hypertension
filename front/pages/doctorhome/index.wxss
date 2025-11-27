@@ -8,22 +8,11 @@
   box-sizing: border-box;
 }
 
-.header {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  width: 100%;
-  margin-bottom: 60rpx;
-}
-
-.time, .network {
-  font-size: 32rpx; /* 辅助文字放大 */
-  color: #333;
-}
-
-.battery {
-  width: 70rpx; /* 电池图标同步放大 */
-  height: 35rpx;
+.logo-placeholder {
+  width: 260px;
+  height: 100px;
+  display: block;
+  margin: 0 auto 18px auto;
 }
 
 .name {
@@ -68,7 +57,7 @@
 }
 
 /* 按钮：尺寸放大，匹配视觉需求 */
-.btn {
+.action-btn {
   width: 650rpx; /* 按钮宽度放大 */
   height: 150rpx; /* 按钮高度放大 */
   background-color: #c5fffe;
@@ -100,31 +89,8 @@
 /* Wrap name and logout chip */
 .name-row { position: relative; width: 100%; }
 
-/* Hide stray button placed outside the container */
-.container + .logout-chip { display: none; }
-
 .logout-chip--hover { background: #f7f7f7; }
 
-/* Larger pill, slightly above the name */
-.name{
-  font-size: 35px;
-}
-.name-row {
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  position: absolute;
-  left: 24rpx;
-  top: -30rpx;
-  z-index: 10;
-  padding: 16rpx 36rpx;
-  border-radius: 999rpx;
-  background: #ffffff;
-  color: #333;
-  font-size: 30rpx;
-  border: 2rpx solid #e8e8e8;
-  box-shadow: 0 8rpx 20rpx rgba(0,0,0,0.08);
-}
 .logout-chip {
   position: fixed;
   top: 200rpx;
